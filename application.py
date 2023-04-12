@@ -1,13 +1,9 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy.optimize import linear_sum_assignment
-
-
-def get_rand_matrix(n: int):
-    #rand_matrix = [[1 for j in range(n)] for i in range(n)]
-    rand_matrix = [[4, 1, 3], [2, 0, 5], [3, 2, 2]]     # Just for example
-    return rand_matrix
-
+from matrix_generation import get_rand_matrix
+from matrix_generation import add_inorganic
+from algorithms import greedy_algorithm, lean_algorithm
 
 def run_experiments(n: int, num_exp=10, add_inorganic=True, output=False):
     # arrays of averaged target functions
@@ -24,7 +20,7 @@ def run_experiments(n: int, num_exp=10, add_inorganic=True, output=False):
         # ___Setting the P matrix values___
         p_matrix = get_rand_matrix(n)
 
-        if (add_inorganic):
+        if add_inorganic:
             ...             # add z_matrix implementation!
 
         # ___Computing the algorithms___
@@ -52,11 +48,19 @@ def run_experiments(n: int, num_exp=10, add_inorganic=True, output=False):
     ax.plot(s_arr_min, color='blue', linestyle='--')
     plt.show()
     input()
-    a = 10
 
 
 def run_application():
     #n = input("Введите размер матрицы:\n")
     #n = int(n)
-    n = 3
-    run_experiments(n, 1)
+    #n = 3
+    #run_experiments(n, 1)
+    p = get_rand_matrix(3)
+    p = add_inorganic(p)
+    print(p)
+    # r, c = greedy_algorithm(p)
+    # r1, c1 = lean_algorithm(p)
+    # r2, c2 = linear_sum_assignment(p)
+    # print(r, c)
+    # print(r1, c1)
+    # print(r2, c2)
