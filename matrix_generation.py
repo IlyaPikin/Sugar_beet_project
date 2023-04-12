@@ -12,7 +12,7 @@ inorganic_in_beet_sorts = np.array([
 ])
 
 
-def get_rand_matrix(n: int, a_low: float = 0.14, a_high: float = 0.22, b_low: float = 0., b_high: float = 1.):
+def get_rand_matrix(n: int, a_low: float = 0.1893, a_high: float = 0.2252, b_low: float = 0.5, b_high: float = 1.):
     a_column = np.random.uniform(a_low, a_high, (n, 1))
     b_matrix = np.random.uniform(b_low, b_high, (n, n-1))
 
