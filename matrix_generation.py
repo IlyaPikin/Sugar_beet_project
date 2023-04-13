@@ -32,9 +32,6 @@ def braunschweig_formula(k: float, na: float, n: float):
 
 def add_inorganic(p_matrix: np.ndarray):
     n = p_matrix.shape[0]
-    # k_content = np.random.uniform(4.88, 7.05, (n, 1))
-    # na_content = np.random.uniform(0.21, 0.82, (n, 1))
-    # n_content = np.random.uniform(1.58, 2.8, (n, 1))
 
     # Массив с номерами сортов каждой партии свёклы
     sort_numbers = np.random.random_integers(low=0, high=5, size=n)

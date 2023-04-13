@@ -3,11 +3,10 @@ import matplotlib.pyplot as plt
 from scipy.optimize import linear_sum_assignment
 from matrix_generation import get_rand_matrix, add_inorganic
 from algorithms import greedy_algorithm, thrifty_algorithm
-from UI import is_venger, is_greedy, is_thrifty
 
 #def calculate():
 
-
+# Добавить а и б, переменные для алгоритмов, неорганика?
 def run_experiments(n: int, num_exp=10, inorganic=True, output=False):
     # Результаты экспериментов
     result = {}
@@ -24,7 +23,7 @@ def run_experiments(n: int, num_exp=10, inorganic=True, output=False):
 
     for series_num in range(num_exp):
         # ___Создание матрицы P___
-        p_matrix = get_rand_matrix(n)
+        p_matrix = get_rand_matrix(n, a_min, a_max, b_min, b_max)
 
         if inorganic:
             p_matrix = add_inorganic(p_matrix)      # учёт связывания сахарозы с неорганикой
@@ -71,6 +70,7 @@ def run_experiments(n: int, num_exp=10, inorganic=True, output=False):
             result['Бережливый алгоритм'] = s_arr_greedy
             result['Погрешность бережливого алг'] = err_arr_thrifty
 
+    # Добавить подписи и перенести это в plot()
     # fig, ax = plt.subplots()
     # ax.plot(s_arr_max, color='red', linestyle='--', marker='o')
     # ax.plot(s_arr_min, color='blue', linestyle='--', marker='o')

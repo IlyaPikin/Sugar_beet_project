@@ -4,10 +4,13 @@ from tkinter import ttk     # подключаем пакет ttk
 from tkinter import filedialog
 from tkinter import font
 import numpy as np
+import pandas as pd
 import matplotlib
 from matplotlib.figure import Figure
 from matplotlib.backends.backend_tkagg import (FigureCanvasTkAgg,
 NavigationToolbar2Tk)
+from matrix_generation import *
+from application import *
 
 ###################### Настройки #############################
 
@@ -57,16 +60,17 @@ cell_font = font.Font(size=13)
 
 n_choice = 10
 fields_matrix = []  # В ней хранятся инпут поля гуя
-matrix = []  # полноценная матрица
+p_matrix = np.array([])  # полноценная матрица
 matrix_show_button_onscreen = False
 showed_matrix_fields = False
 is_generated_by_random = False
 neorganic_on = BooleanVar()
+results = {}
 
-a_min = DoubleVar(value=0.5)
-a_max = DoubleVar(value=0.5)
+a_min = DoubleVar(value=0.1893)
+a_max = DoubleVar(value=0.2252)
 b_min = DoubleVar(value=0.5)
-b_max = DoubleVar(value=0.5)
+b_max = DoubleVar(value=1.0)
 
 is_venger_max = BooleanVar(value=False)
 is_venger_min = BooleanVar(value=False)
@@ -90,8 +94,10 @@ def load_matrix_from_file():
     filepath = filedialog.askopenfilename()
 
 
-def save_res_in_table():
-    filepath = filedialog.asksaveasfilename()
+def save_res_in_table(results: dict[str, float]):
+    filepath = filedialog.askopenfilename()
+    df = pd.DataFrame(results)
+    df.to_excel(filepath)
 
 
 def save_res_in_graph():
@@ -104,17 +110,28 @@ def gen_random_matr():
     global is_generated_by_random
     is_generated_by_random = True
     fields_matrix.clear()
-    for row in range(n_choice):
-        for column in range(n_choice):
-            value = DoubleVar(value=random.randint(10, 30))
-            fields_matrix.append(value)
+    # for row in range(n_choice):
+    #     for column in range(n_choice):
+    #         value = DoubleVar(value=random.randint(10, 30))
+    #         fields_matrix.append(value)
+    p_matrix = get_rand_matrix(n_choice, a_min.get(), a_max.get(), b_min.get(), b_max.get())
+    if neorganic_on:
+        p_matrix = add_inorganic(p_matrix)
+
+    # Заполнить fields_matrix из p_matrix - пройтись по массиву (Илья)
+    # + функции конвертации
+
     rerun_left_frame()
     display_left_screen_down()
 
 
 def start_experiments():
+    global results
     global is_experiment
     is_experiment = True
+    results = run_experiments() # дописать
+    display_right_frame()
+
 
 def rerun_left_frame():
     global matrix_frame
@@ -138,13 +155,13 @@ def rerun_right_frame():
                              )
     result_frame.place(x=575, y=100)
 
-def change_borders():
-    pass
-
 
 def calculate():
+    global results
     global is_calculating
     is_calculating = True
+    results = calculate() # дописать
+    display_right_frame()
 
 def save_results():
     pass
