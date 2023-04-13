@@ -31,17 +31,21 @@ top_frame = ttk.Frame(master=root,
 
 matrix_frame = ttk.Frame(master=root,
                          width=500,
-                         height=500
+                         height=600,
+borderwidth=1,
+                      relief=SOLID,
                          )
 
 result_frame = ttk.Frame(master=root,
                       width=500,
-                      height=500
+                      height=600
                       )
 
 top_frame.pack(anchor='n', fill=BOTH)
-matrix_frame.pack(side=LEFT)
-result_frame.pack(side=RIGHT)
+
+
+matrix_frame.place(x=20, y=100)
+result_frame.place(x=600, y=100)
 
 ##################### Переменные состояния ####################
 
@@ -50,7 +54,8 @@ fields_matrix = [] # В ней хранятся инпут поля гуя
 matrix = [] # полноценная матрица
 matrix_show_button_onscreen = False
 showed_matrix_fields = False
-is_generated_by_random= False
+is_generated_by_random = False
+neorganic_on = BooleanVar()
 
 ###################### Шаблоны функций ########################
 
@@ -104,11 +109,45 @@ def show_matrix():
 
 
 
+a_min = DoubleVar(value=0.5)
+a_max = DoubleVar(value=0.5)
+b_min = DoubleVar(value=0.5)
+b_max = DoubleVar(value=0.5)
+
+def display_left_screen():
+    start_x = 50
+    start_y = 50
+    dif_y = 30
+    dif_x = 150
+    a_min_entry = ttk.Entry(master=matrix_frame, textvariable=a_min)
+    a_min_label = ttk.Label(master=matrix_frame, text="Нижняя граница a")
+    a_max_entry = ttk.Entry(master=matrix_frame, textvariable=a_max)
+    a_max_label = ttk.Label(master=matrix_frame, text="Верхняя граница a")
+    b_min_entry = ttk.Entry(master=matrix_frame, textvariable=b_min)
+    b_min_label = ttk.Label(master=matrix_frame, text="Нижняя граница b")
+    b_max_entry = ttk.Entry(master=matrix_frame, textvariable=b_max)
+    b_max_label = ttk.Label(master=matrix_frame, text="Верхняя граница b")
+    a_min_label.place(x=start_x, y=start_y)
+    a_min_entry.place(x=start_x, y=start_y + dif_y)
+
+    a_max_label.place(x=start_x + dif_x, y=start_y)
+    a_max_entry.place(x=start_x + dif_x, y=start_y + dif_y)
+    b_min_label.place(x=start_x, y=start_y + 2*dif_y)
+    b_min_entry.place(x=start_x, y=start_y + 3*dif_y)
+    b_max_label.place(x=start_x + dif_x, y=start_y + 2*dif_y)
+    b_max_entry.place(x=start_x + dif_x, y=start_y + 3*dif_y)
+    neorg_button = ttk.Checkbutton(text="Влияние неорганики", variable=neorganic_on)
+    neorg_button.place(x=start_x, y=start_y + 8*dif_y)
+
+
+
+
 show_matr_button = ttk.Button(master=matrix_frame,
                            text="Показать матрицу",
                            command=show_matrix)
 
-show_matr_button.place(x=250, y=200)
+display_left_screen()
+show_matr_button.place(x=180, y=550)
 
 def destroy_matrix():
     global fields_matrix
@@ -130,25 +169,32 @@ def display_matrix(n_choice, frame):
             matrix_frame.destroy()
             matrix_frame = ttk.Frame(master=root,
                                      width=500,
-                                     height=500
+                                     height=600,
+                                     borderwidth=1,
+                                     relief=SOLID,
                                      )
-            matrix_frame.pack(side=LEFT)
+            matrix_frame.place(x=20, y=100)
+            display_left_screen()
             show_matr_button = ttk.Button(master=matrix_frame,
                            text="Показать матрицу",
                            command=show_matrix)
 
-            show_matr_button.place(x=250, y=200)
+            show_matr_button.place(x=180, y=550)
             matrix_show_button_onscreen = True
             showed_matrix_fields = False
+
     else:
         if is_generated_by_random:
             is_generated_by_random = False
             matrix_frame.destroy()
             matrix_frame = ttk.Frame(master=root,
                                      width=500,
-                                     height=500
+                                     height=600,
+                                     borderwidth=1,
+                                     relief=SOLID,
                                      )
-            matrix_frame.place(x=60, y=250)
+            matrix_frame.place(x=20, y=100)
+            display_left_screen()
             matrix_show_button_onscreen = False
             showed_matrix_fields = True
             for row in range(n_choice):
@@ -163,9 +209,12 @@ def display_matrix(n_choice, frame):
             matrix_frame.destroy()
             matrix_frame = ttk.Frame(master=root,
                                      width=500,
-                                     height=500
+                                     height=600,
+                                     borderwidth=1,
+                                     relief=SOLID,
                                      )
-            matrix_frame.place(x=60, y=250)
+            matrix_frame.place(x=20, y=100)
+            display_left_screen()
             matrix_show_button_onscreen = False
             showed_matrix_fields = True
             for row in range(n_choice):
@@ -184,9 +233,12 @@ def display_matrix(n_choice, frame):
             matrix_frame.destroy()
             matrix_frame = ttk.Frame(master=root,
                                      width=500,
-                                     height=500
+                                     height=600,
+                                     borderwidth=1,
+                                     relief=SOLID,
                                      )
-            matrix_frame.place(x=60, y=250)
+            matrix_frame.place(x=20, y=100)
+            display_left_screen()
             for row in range(n_choice):
                 for column in range(n_choice):
                     value = DoubleVar()
@@ -214,42 +266,11 @@ file_menu.add_command(label="Загрузить матрицу из файла",
 
 
 
-a_min = DoubleVar(value=0.5)
-a_max = DoubleVar(value=0.5)
-b_min = DoubleVar(value=0.5)
-b_max = DoubleVar(value=0.5)
 
-def border_screen():
-    window = Toplevel()
-    window.title("Выбор алгоритмов")
-    window.geometry("400x400")
-    window.protocol("WM_DELETE_WINDOW", lambda: dismiss(window))
-    close_button = ttk.Button(master=window, text="Готово", command=lambda: dismiss(window))
-    a_min_entry = ttk.Entry(master=window, textvariable=a_min)
-    a_min_label = ttk.Label(master=window, text="Нижняя граница a")
-    a_max_entry = ttk.Entry(master=window, textvariable=a_max)
-    a_max_label = ttk.Label(master=window, text="Верхняя граница a")
-    b_min_entry = ttk.Entry(master=window, textvariable=b_min)
-    b_min_label = ttk.Label(master=window, text="Нижняя граница b")
-    b_max_entry = ttk.Entry(master=window, textvariable=b_max)
-    b_max_label = ttk.Label(master=window, text="Верхняя граница b")
-    a_min_label.pack(anchor=NW)
-    a_min_entry.pack(anchor=NW)
-    a_max_label.pack(anchor=NW)
-    a_max_entry.pack(anchor=NW)
-    b_min_label.pack(anchor=NW)
-    b_min_entry.pack(anchor=NW)
-    b_max_label.pack(anchor=NW)
-    b_max_entry.pack(anchor=NW)
 
-    close_button.pack(anchor="center", expand=1)
-    window.grab_set()
-
-setting_menu.add_command(label="Изменить границы генерации", command=border_screen)
 
 file_menu.add_cascade(label="Сохранить...", menu=save_menu)
 main_menu.add_cascade(label="Файл", menu=file_menu)
-main_menu.add_cascade(label="Настройки генерации", menu=setting_menu)
 root.config(menu=main_menu)
 
 
