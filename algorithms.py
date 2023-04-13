@@ -21,7 +21,7 @@ def greedy_algorithm(p_matrix: np.ndarray):
     return row_ind, col_ind
 
 
-def lean_algorithm(p_matrix: np.ndarray):
+def thrifty_algorithm(p_matrix: np.ndarray):
     n = p_matrix.shape[0]
     row_ind = np.zeros((n,), dtype=int)
     col_ind = np.zeros((n,), dtype=int)
