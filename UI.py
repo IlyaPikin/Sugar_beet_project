@@ -11,6 +11,7 @@ from matplotlib.backends.backend_tkagg import (FigureCanvasTkAgg,
 NavigationToolbar2Tk)
 from matrix_generation import *
 from application import *
+from tkinter.messagebox import showerror, showwarning, showinfo
 
 ###################### Настройки #############################
 
@@ -54,6 +55,12 @@ result_frame.place(x=575, y=100)
 
 ##################### Переменные состояния ####################
 
+# button_image=PhotoImage(file="button.png")
+# button_style = ttk.Style()
+# button_style.configure('W.TButton', borderwidth=0, padding=3, relief='flat', background="#ccc", width=1, heigh=1)
+
+right_border_value = [1, 1, 1, 1]
+
 top_font = font.Font(weight="bold", size=12)
 medium_font = font.Font(weight="bold", size=10)
 cell_font = font.Font(size=13)
@@ -82,8 +89,164 @@ count_series = IntVar(value=10)
 is_experiment = False
 is_calculating = False
 
+err_msg_a_min = StringVar()
+err_msg_a_max = StringVar()
+err_msg_b_min = StringVar()
+err_msg_b_max = StringVar()
+
 
 ###################### Шаблоны функций ########################
+
+
+def is_valid_a_min(new_val):
+    if new_val == "":
+        err_msg_a_min.set("Заполните поле!")
+        return False
+        right_border_value[0] = 0
+    try:
+        float(new_val)
+    except ValueError:
+        err_msg_a_min.set("Введите число!")
+        right_border_value[0] = 0
+        return False
+    try:
+        float(a_max.get())
+    except Exception as e:
+        err_msg_a_min.set("Верхняя граница не является числом!")
+        right_border_value[0] = 0
+        return False
+    value = float(new_val)
+    if value > a_max.get():
+        err_msg_a_min.set("Значение больше верхней границы!")
+        right_border_value[0] = 0
+        return False
+    elif value < 0.0:
+        err_msg_a_min.set("Значение меньше 0!")
+        right_border_value[0] = 0
+        return False
+    elif value > 1:
+        err_msg_a_min.set("Значение больше 1!")
+        right_border_value[0] = 0
+        return False
+    else:
+        err_msg_a_min.set("")
+        right_border_value[0] = 1
+        return True
+
+
+def is_valid_a_max(new_val):
+    if new_val == "":
+        err_msg_a_max.set("Заполните поле!")
+        right_border_value[1] = 0
+        return False
+    try:
+        float(new_val)
+    except ValueError:
+        err_msg_a_max.set("Введите число!")
+        right_border_value[1] = 0
+        return False
+    try:
+        float(a_min.get())
+    except Exception as e:
+        err_msg_a_max.set("Нижняя граница не является числом!")
+        right_border_value[1] = 0
+        return False
+    value = float(new_val)
+    if value < a_min.get():
+        err_msg_a_max.set("Значение меньше нижней границы!")
+        right_border_value[1] = 0
+        return False
+    elif value < 0.0:
+        err_msg_a_max.set("Значение меньше 0!")
+        right_border_value[1] = 0
+        return False
+    elif value > 1:
+        err_msg_a_max.set("Значение больше 1!")
+        right_border_value[1] = 0
+        return False
+    else:
+        err_msg_a_max.set("")
+        right_border_value[1] = 1
+        return True
+
+
+def is_valid_b_min(new_val):
+    if new_val == "":
+        err_msg_b_min.set("Заполните поле!")
+        right_border_value[2] = 0
+        return False
+    try:
+        float(new_val)
+    except ValueError:
+        err_msg_b_min.set("Введите число!")
+        right_border_value[2] = 0
+        return False
+    try:
+        float(b_max.get())
+    except Exception as e:
+        err_msg_b_min.set("Верхняя граница не является числом!")
+        right_border_value[2] = 0
+        return False
+    value = float(new_val)
+    if value > b_max.get():
+        err_msg_b_min.set("Значение больше верхней границы!")
+        right_border_value[2] = 0
+        return False
+    elif value < 0.0:
+        err_msg_b_min.set("Значение меньше 0!")
+        right_border_value[2] = 0
+        return False
+    elif value > 1:
+        err_msg_b_min.set("Значение больше 1!")
+        right_border_value[2] = 0
+        return False
+    else:
+        err_msg_b_min.set("")
+        right_border_value[2] = 1
+        return True
+
+
+def is_valid_b_max(new_val):
+    if new_val == "":
+        err_msg_b_max.set("Заполните поле!")
+        right_border_value[3] = 0
+        return False
+    try:
+        float(new_val)
+    except ValueError:
+        err_msg_b_max.set("Введите число!")
+        right_border_value[3] = 0
+        return False
+    try:
+        float(b_min.get())
+    except Exception as e:
+        err_msg_b_max.set("Нижняя граница не является числом!")
+        right_border_value[3] = 0
+        return False
+    value = float(new_val)
+    if value < b_min.get():
+        err_msg_b_max.set("Значение меньше нижней границы!")
+        right_border_value[3] = 0
+        return False
+    elif value < 0.0:
+        err_msg_b_max.set("Значение меньше 0!")
+        right_border_value[3] = 0
+        return False
+    elif value > 1:
+        err_msg_b_max.set("Значение больше 1!")
+        right_border_value[3] = 0
+        return False
+    else:
+        err_msg_b_max.set("")
+        right_border_value[3] = 1
+        return True
+
+
+check_a_min = (root.register(is_valid_a_min), "%P")
+check_a_max = (root.register(is_valid_a_max), "%P")
+check_b_min = (root.register(is_valid_b_min), "%P")
+check_b_max = (root.register(is_valid_b_max), "%P")
+
 
 def dismiss(window):
     window.grab_release()
@@ -103,10 +266,26 @@ def save_res_in_table(results: dict[str, float]):
 def save_res_in_graph():
     filepath = filedialog.asksaveasfilename()
 
+
 def get_normal_matrix():
     pass
 
+
+def open_error_with_gen():
+    showerror(title="Ошибка!", message="Ошибка в выборе границ генерации!")
+
+
+def open_error_with_calc():
+    showerror(title="Ошибка!", message="Ошибка ввода данных в матрице!")
+
+
+def open_error_with_series():
+    showerror(title="Ошибка!", message="Ошибка выбора числа серий экспериментов!")
+
 def gen_random_matr():
+    if 0 in right_border_value:
+        open_error_with_gen()
+        return
     global is_generated_by_random
     is_generated_by_random = True
     fields_matrix.clear()
@@ -125,12 +304,21 @@ def gen_random_matr():
     display_left_screen_down()
 
 
+def valid_series():
+    try:
+        int(count_series.get())
+    except Exception as e:
+        return False
+    return True
+
 def start_experiments():
+    if not valid_series():
+        open_error_with_series()
+        return
     global results
-    global is_experiment
-    is_experiment = True
-    results = run_experiments() # дописать
-    display_right_frame()
+    # results = run_experiments() # дописать
+    rerun_right_frame()
+    display_right_frame(has_data=True, is_experiment=True)
 
 
 def rerun_left_frame():
@@ -144,6 +332,7 @@ def rerun_left_frame():
                              )
     matrix_frame.place(x=20, y=100)
 
+
 def rerun_right_frame():
     global result_frame
     result_frame.destroy()
@@ -156,12 +345,18 @@ def rerun_right_frame():
     result_frame.place(x=575, y=100)
 
 
+def matrix_valid():
+    return False
+
+
 def calculate():
+    if not matrix_valid():
+        open_error_with_calc()
+        return
     global results
-    global is_calculating
-    is_calculating = True
-    results = calculate() # дописать
-    display_right_frame()
+    # results = calculate() # дописать
+    rerun_right_frame()
+    display_right_frame(has_data=True, is_experiment=False)
 
 def save_results():
     pass
@@ -217,12 +412,12 @@ def display_top_screen():
     modes_alg_label = ttk.Label(master=top_frame, text="Режимы запуска алгоритмов", font=top_font)
     experiments_button = ttk.Button(master=top_frame,
                                     text="Решение задачи о назначениях",
-                                    command=start_experiments,
+                                    command=calculate,
                                     width=40
                                     )
     calculate_button = ttk.Button(master=top_frame,
                                   text="Вычислительный эксперимент",
-                                  command=calculate,
+                                  command=start_experiments,
                                   width=40
                                   )
     choice_series_label = ttk.Label(master=top_frame, text="Количество серий", font=medium_font)
@@ -287,25 +482,41 @@ def display_left_screen_down():
     start_y = 80
     dif_y = 25
     dif_x = 150
-    a_min_entry = ttk.Entry(master=matrix_frame, textvariable=a_min)
+    a_min_entry = ttk.Entry(master=matrix_frame, textvariable=a_min, validatecommand=check_a_min, validate="focusout")
     a_min_label = ttk.Label(master=matrix_frame, text="Нижняя граница a")
-    a_max_entry = ttk.Entry(master=matrix_frame, textvariable=a_max)
+    err_label_a_min = ttk.Label(master=matrix_frame, foreground='red', textvariable=err_msg_a_min)
+
+    a_max_entry = ttk.Entry(master=matrix_frame, textvariable=a_max,  validatecommand=check_a_max, validate="focusout")
     a_max_label = ttk.Label(master=matrix_frame, text="Верхняя граница a")
-    b_min_entry = ttk.Entry(master=matrix_frame, textvariable=b_min)
+    err_label_a_max = ttk.Label(master=matrix_frame, foreground='red', textvariable=err_msg_a_max)
+
+    b_min_entry = ttk.Entry(master=matrix_frame, textvariable=b_min, validatecommand=check_b_min, validate="focusout")
     b_min_label = ttk.Label(master=matrix_frame, text="Нижняя граница b")
-    b_max_entry = ttk.Entry(master=matrix_frame, textvariable=b_max)
+    err_label_b_min = ttk.Label(master=matrix_frame, foreground='red', textvariable=err_msg_b_min)
+
+    b_max_entry = ttk.Entry(master=matrix_frame, textvariable=b_max, validatecommand=check_b_max, validate="focusout")
     b_max_label = ttk.Label(master=matrix_frame, text="Верхняя граница b")
+    err_label_b_max = ttk.Label(master=matrix_frame, foreground='red', textvariable=err_msg_b_max)
+
     a_min_label.place(x=start_x, y=start_y)
     a_min_entry.place(x=start_x, y=start_y + dif_y)
+    err_label_a_min.place(x=20, y=start_y + 2 * dif_y)
 
-    a_max_label.place(x=start_x + dif_x, y=start_y)
-    a_max_entry.place(x=start_x + dif_x, y=start_y + dif_y)
-    b_min_label.place(x=start_x, y=start_y + 2 * dif_y)
-    b_min_entry.place(x=start_x, y=start_y + 3 * dif_y)
-    b_max_label.place(x=start_x + dif_x, y=start_y + 2 * dif_y)
-    b_max_entry.place(x=start_x + dif_x, y=start_y + 3 * dif_y)
+
+    a_max_label.place(x=start_x + dif_x + 70, y=start_y)
+    a_max_entry.place(x=start_x + dif_x + 70, y=start_y + dif_y)
+    err_label_a_max.place(x=start_x + dif_x + 70, y=start_y + 2 * dif_y)
+
+    b_min_label.place(x=start_x, y=start_y + 3 * dif_y)
+    b_min_entry.place(x=start_x, y=start_y + 4 * dif_y)
+    err_label_b_min.place(x=20, y=start_y + 5 * dif_y)
+
+    b_max_label.place(x=start_x + dif_x + 70, y=start_y + 3 * dif_y)
+    b_max_entry.place(x=start_x + dif_x + 70, y=start_y + 4 * dif_y)
+    err_label_b_max.place(x=start_x + dif_x + 70,  y=start_y + 5 * dif_y)
+
     neorg_button = ttk.Checkbutton(text="Влияние неорганики", variable=neorganic_on)
-    neorg_button.place(x=start_x+20, y=start_y + 9 * dif_y)
+    neorg_button.place(x=start_x+20, y=start_y + 9.8 * dif_y)
 
     random_button = ttk.Button(master=matrix_frame,
                                text="Сгенерировать матрицу",
@@ -313,7 +524,7 @@ def display_left_screen_down():
                                width=25
                                )
 
-    random_button.place(x=start_x, y=start_y + 6.5 * dif_y)
+    random_button.place(x=start_x, y=start_y + 7 * dif_y)
 
     ############################################## МАТРИЦА ###############################################
 
@@ -380,18 +591,19 @@ root.config(menu=main_menu)
 
 ################################### RIGHT FRAME ########################################
 
-def plot():
+def plot(has_data):
     fig = Figure(figsize=(5, 4.5),
                  dpi=100)
-
-    # list of squares
-    y = [i ** 2 for i in range(101)]
-
-    # adding the subplot
-    plot1 = fig.add_subplot(111)
-
-    # plotting the graph
-    plot1.plot(y)
+    if has_data:
+        # list of squares
+        data = [i ** 2 for i in range(101)]
+        plot1 = fig.add_subplot(111)
+        # plotting the graph
+        plot1.plot(data)
+    else:
+        plot1 = fig.add_subplot(111)
+        # plotting the graph
+        plot1.plot()
     canvas = FigureCanvasTkAgg(fig,
                                master=result_frame)
     canvas.draw()
@@ -400,8 +612,13 @@ def plot():
     canvas.get_tk_widget().place(x=0, y=0)
 
 
-def display_right_frame():
-    plot()
+def display_right_frame(has_data, is_experiment):
+    plot(has_data)
+
+    if is_experiment:
+        pass
+    else:
+        pass
 
     currentAlg = 0
     places = [(10, 470), (10, 490), (10, 510), (10, 530)]
@@ -449,7 +666,7 @@ def display_right_frame():
                                 command=save_results)
     button_get_res.place(x=190, y=565)
 
-display_right_frame()
+display_right_frame(False, False)
 
 
 
