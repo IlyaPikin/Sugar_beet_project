@@ -71,12 +71,14 @@ p_matrix = np.array([])  # полноценная матрица
 matrix_show_button_onscreen = False
 showed_matrix_fields = False
 is_generated_by_random = False
+is_loaded_from_file = False
 neorganic_on = BooleanVar()
-results = {}
+target_funcs = {}   # Массивы значений целевых функций на каждом этапе переработки
+results = {}        # Основные результаты
 
 a_min = DoubleVar(value=0.1893)
 a_max = DoubleVar(value=0.2252)
-b_min = DoubleVar(value=0.5)
+b_min = DoubleVar(value=0.8)
 b_max = DoubleVar(value=1.0)
 
 is_venger_max = BooleanVar(value=False)
@@ -254,10 +256,35 @@ def dismiss(window):
 
 
 def load_matrix_from_file():
+    global n_choice, p_matrix, fields_matrix, is_loaded_from_file
     filepath = filedialog.askopenfilename()
+    df = pd.read_excel(filepath, header=None)
+    matrix = np.array(df)
+
+    # Здесь должны быть и другие проверки на валидность матрицы!
+
+    if matrix.shape[0] == matrix.shape[1]:
+        is_loaded_from_file = True
+        n_choice = matrix.shape[0]
+        p_matrix = matrix
+        fields_matrix.clear()
+        array_1d = p_matrix.flatten()  # Уменьшение размерности до 1
+        fields_matrix = [DoubleVar(value=el) for el in array_1d]  # Приведение типов
+
+        rerun_left_frame()
+        display_left_screen_down()
+    else:
+        raise Exception('Матрица из файла неквадратная!')
 
 
-def save_res_in_table(results: dict[str, float]):
+def save_matrix_in_file():
+    # ПОЛУЧИТЬ filepath из функции!
+    filepath = './матрица2.xlsx'    # это удалить
+    df = pd.DataFrame(p_matrix)
+    df.to_excel(filepath, index=False, header=False)
+
+
+def save_res_in_table():
     filepath = filedialog.askopenfilename()
     df = pd.DataFrame(results)
     df.to_excel(filepath)
@@ -282,23 +309,23 @@ def open_error_with_calc():
 def open_error_with_series():
     showerror(title="Ошибка!", message="Ошибка выбора числа серий экспериментов!")
 
+
 def gen_random_matr():
+    global fields_matrix, p_matrix, is_generated_by_random
+
     if 0 in right_border_value:
         open_error_with_gen()
         return
-    global is_generated_by_random
+
     is_generated_by_random = True
     fields_matrix.clear()
-    # for row in range(n_choice):
-    #     for column in range(n_choice):
-    #         value = DoubleVar(value=random.randint(10, 30))
-    #         fields_matrix.append(value)
     p_matrix = get_rand_matrix(n_choice, a_min.get(), a_max.get(), b_min.get(), b_max.get())
-    if neorganic_on:
+
+    if neorganic_on.get():
         p_matrix = add_inorganic(p_matrix)
 
-    # Заполнить fields_matrix из p_matrix - пройтись по массиву (Илья)
-    # + функции конвертации
+    array_1d = p_matrix.flatten()   # Уменьшение размерности до 1
+    fields_matrix = [DoubleVar(value=el) for el in array_1d]    # Приведение типов
 
     rerun_left_frame()
     display_left_screen_down()
@@ -311,12 +338,16 @@ def valid_series():
         return False
     return True
 
+
 def start_experiments():
     if not valid_series():
         open_error_with_series()
         return
-    global results
-    # results = run_experiments() # дописать
+    global target_funcs, results
+    target_funcs, results = run_experiments(n_choice, count_series.get(), neorganic_on.get(),
+                              is_venger_max.get(), is_venger_min.get(), is_greedy.get(), is_thrifty.get(),
+                              a_min.get(), a_max.get(), b_min.get(), b_max.get()
+                              )
     rerun_right_frame()
     display_right_frame(has_data=True, is_experiment=True)
 
@@ -346,15 +377,16 @@ def rerun_right_frame():
 
 
 def matrix_valid():
-    return False
+    return True     # Пока написал тру, чтобы затестить
 
 
 def calculate():
     if not matrix_valid():
         open_error_with_calc()
         return
-    global results
-    # results = calculate() # дописать
+    global target_funcs, results, p_matrix
+    target_funcs, results = run_calculate(p_matrix, is_venger_max.get(), is_venger_min.get(),
+                                            is_greedy.get(), is_thrifty.get())
     rerun_right_frame()
     display_right_frame(has_data=True, is_experiment=False)
 
@@ -541,7 +573,7 @@ def display_left_screen_down():
         dif_x = 90
         start_y = 350
         dif_y = 25
-        if is_generated_by_random:
+        if is_generated_by_random or is_loaded_from_file:
             for row in range(n_choice):
                 for column in range(n_choice):
                     field = ttk.Entry(master=matrix_frame,
@@ -591,29 +623,42 @@ root.config(menu=main_menu)
 
 ################################### RIGHT FRAME ########################################
 
-def plot(has_data):
+def plot(has_data, is_experiment):
     fig = Figure(figsize=(5, 4.5),
                  dpi=100)
+
+    colors = {'Оптимальный макс': 'red',
+              'Оптимальный мин': 'blue',
+              'Жадный алгоритм': 'orange',
+              'Бережливый алгоритм': 'green'
+              }
+
+    plot1 = fig.add_subplot(111)
     if has_data:
-        # list of squares
-        data = [i ** 2 for i in range(101)]
-        plot1 = fig.add_subplot(111)
         # plotting the graph
-        plot1.plot(data)
+        for key, value in target_funcs.items():
+            if key != 'Погрешность бережливого алг' and key != 'Погрешность жадного алг':
+                plot_color = colors[key]
+                plot1.plot(value, label=key, color=plot_color, linestyle='--', marker='o', linewidth=0.7)
+        plot1.set_xlabel("Этапы переработки")
+        plot1.set_ylabel("Значения целевой функции")
+        if not target_funcs == {}:
+            plot1.legend(loc='lower right')
+        if is_experiment:
+            plot1.set_title('Динамика усреднённых целевых функций', fontsize=11, fontweight='bold')
+        else:
+            plot1.set_title('Динамика целевых функций', fontsize=11, fontweight='bold')
     else:
-        plot1 = fig.add_subplot(111)
-        # plotting the graph
         plot1.plot()
+
     canvas = FigureCanvasTkAgg(fig,
                                master=result_frame)
     canvas.draw()
-
-
     canvas.get_tk_widget().place(x=0, y=0)
 
 
 def display_right_frame(has_data, is_experiment):
-    plot(has_data)
+    plot(has_data, is_experiment)
 
     if is_experiment:
         pass

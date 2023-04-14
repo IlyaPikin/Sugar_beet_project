@@ -1,15 +1,79 @@
 import numpy as np
-import matplotlib.pyplot as plt
 from scipy.optimize import linear_sum_assignment
 from matrix_generation import get_rand_matrix, add_inorganic
 from algorithms import greedy_algorithm, thrifty_algorithm
 
-#def calculate():
 
-# Добавить а и б, переменные для алгоритмов, неорганика?
-def run_experiments(n: int, num_exp=10, inorganic=True, output=False):
+def run_calculate(p_matrix: np.ndarray, is_venger_max: bool, is_venger_min: bool, is_greedy: bool, is_thrifty: bool):
+    n = p_matrix.shape[0]
+    target_funcs = {}     # Массивы значений целевых функций
+    results = {}          # Индексы элементов матрицы, полученные из алгоримов, и суммы этих элементов
+
+    # Массивы значений целевых функций на каждом этапе переработки
+    arr_max = np.zeros((n,))  # Оптимальный макс
+    arr_min = np.zeros((n,))  # Оптимальный мин
+    arr_greedy = np.zeros((n,))  # Жадный
+    arr_thrifty = np.zeros((n,))  # Бережливый
+
+    # ___Выполнение алгоритмов___
+    # 1. Оптимальный макс
+    if is_venger_max:
+        col_ind_max, row_ind_max = linear_sum_assignment(np.array(p_matrix.T), True)  # Транспонирование для удобства
+        arr_max[0] = p_matrix[row_ind_max[0]][col_ind_max[0]]
+        for i in range(1, n):
+            value_on_i_stage = p_matrix[row_ind_max[i]][col_ind_max[i]]
+            arr_max[i] = arr_max[i - 1] + value_on_i_stage
+        target_funcs['Оптимальный макс'] = arr_max
+        results['Индекс столбца (оптимальный макс)'] = col_ind_max
+        results['Индекс строки (оптимальный макс)'] = row_ind_max
+        results['Сумма (оптимальный макс)'] = p_matrix[col_ind_max, row_ind_max].sum()
+
+    # 2. Оптимальный мин
+    if is_venger_min:
+        col_ind_min, row_ind_min = linear_sum_assignment(np.array(p_matrix.T), False)  # Трансп-е для удобства
+        arr_min[0] = p_matrix[row_ind_min[0]][col_ind_min[0]]
+        for i in range(1, n):
+            value_on_i_stage = p_matrix[row_ind_min[i]][col_ind_min[i]]
+            arr_min[i] = arr_min[i - 1] + value_on_i_stage
+        target_funcs['Оптимальный мин'] = arr_min
+        results['Индекс столбца (оптимальный мин)'] = col_ind_min
+        results['Индекс строки (оптимальный мин)'] = row_ind_min
+        results['Сумма (оптимальный мин)'] = p_matrix[col_ind_min, row_ind_min].sum()
+
+    # 3. Жадный алгоритм
+    if is_greedy:
+        row_ind_greedy, col_ind_greedy = greedy_algorithm(p_matrix)
+        arr_greedy[0] = p_matrix[row_ind_greedy[0]][col_ind_greedy[0]]
+        for i in range(1, n):
+            value_on_i_stage = p_matrix[row_ind_greedy[i]][col_ind_greedy[i]]
+            arr_greedy[i] = arr_greedy[i - 1] + value_on_i_stage
+        target_funcs['Жадный алгоритм'] = arr_greedy
+        results['Индекс столбца (жадный алг)'] = col_ind_greedy
+        results['Индекс строки (жадный алг)'] = row_ind_greedy
+        results['Сумма (жадный алг)'] = p_matrix[row_ind_greedy, col_ind_greedy].sum()
+
+    # 4. Бережливый алгоритм
+    if is_thrifty:
+        row_ind_thrifty, col_ind_thrifty = thrifty_algorithm(p_matrix)
+        arr_thrifty[0] = p_matrix[row_ind_thrifty[0]][col_ind_thrifty[0]]
+        for i in range(1, n):
+            value_on_i_stage = p_matrix[row_ind_thrifty[i]][col_ind_thrifty[i]]
+            arr_thrifty[i] = arr_thrifty[i - 1] + value_on_i_stage
+        target_funcs['Бережливый алгоритм'] = arr_thrifty
+        results['Индекс столбца (бережливый алг)'] = col_ind_thrifty
+        results['Индекс строки (бережливый алг)'] = row_ind_thrifty
+        results['Сумма (бережливый алг)'] = p_matrix[row_ind_thrifty, col_ind_thrifty].sum()
+
+    return target_funcs, results
+
+
+def run_experiments(n: int, num_exp: int, inorganic: bool,
+                    is_venger_max: bool, is_venger_min: bool, is_greedy: bool, is_thrifty: bool,
+                    a_min: float, a_max: float, b_min: float, b_max: float
+                    ):
     # Результаты экспериментов
-    result = {}
+    target_funcs = {}
+    results = {}
 
     # Массивы значений усреднённых целевых функций на каждом этапе переработки
     s_arr_max = np.zeros((n,))       # Оптимальный макс
@@ -17,11 +81,13 @@ def run_experiments(n: int, num_exp=10, inorganic=True, output=False):
     s_arr_greedy = np.zeros((n,))    # Жадный
     s_arr_thrifty = np.zeros((n,))   # Бережливый
 
-    # Массивы значений усреднённых относительных ошибок
-    err_arr_greedy = np.zeros((n,))   # Погрешность жадного
-    err_arr_thrifty = np.zeros((n,))  # Погрешность бережливого
+    for _ in range(num_exp):
+        # Локальный массивы целевых функций
+        arr_max = np.zeros((n,))        # Оптимальный макс
+        arr_min = np.zeros((n,))        # Оптимальный мин
+        arr_greedy = np.zeros((n,))     # Жадный
+        arr_thrifty = np.zeros((n,))    # Бережливый
 
-    for series_num in range(num_exp):
         # ___Создание матрицы P___
         p_matrix = get_rand_matrix(n, a_min, a_max, b_min, b_max)
 
@@ -31,53 +97,59 @@ def run_experiments(n: int, num_exp=10, inorganic=True, output=False):
         # ___Выполнение алгоритмов___
         # 1. Оптимальный макс
         col_ind_max, row_ind_max = linear_sum_assignment(np.array(p_matrix.T), True)    # Транспонирование для удобства
-        s_arr_max[0] = p_matrix[row_ind_max[0]][col_ind_max[0]]/num_exp
+        arr_max[0] = p_matrix[row_ind_max[0]][col_ind_max[0]]
         for i in range(1, n):
             value_on_i_stage = p_matrix[row_ind_max[i]][col_ind_max[i]]
-            s_arr_max[i] = s_arr_max[i-1] + value_on_i_stage/num_exp    # Деление для усреднения
-        result['Оптимальный макс'] = s_arr_max
+            arr_max[i] = arr_max[i-1] + value_on_i_stage
+        s_arr_max += arr_max
 
         # 2. Оптимальный мин
-        if is_venger:
+        if is_venger_min:
             col_ind_min, row_ind_min = linear_sum_assignment(np.array(p_matrix.T), False)  # Трансп-е для удобства
-            s_arr_min[0] = p_matrix[row_ind_min[0]][col_ind_min[0]]/num_exp
+            arr_min[0] = p_matrix[row_ind_min[0]][col_ind_min[0]]
             for i in range(1, n):
                 value_on_i_stage = p_matrix[row_ind_min[i]][col_ind_min[i]]
-                s_arr_min[i] = s_arr_min[i-1] + value_on_i_stage/num_exp    # Деление для усреднения
-            result['Оптимальный мин'] = s_arr_min
+                arr_min[i] = arr_min[i-1] + value_on_i_stage
+            s_arr_min += arr_min
 
         # 3. Жадный алгоритм
         if is_greedy:
             row_ind_greedy, col_ind_greedy = greedy_algorithm(p_matrix)
-            s_arr_greedy[0] = p_matrix[row_ind_greedy[0]][col_ind_greedy[0]]/num_exp
-            err_arr_greedy[0] = abs(s_arr_max[0] - s_arr_greedy[0])/num_exp
+            arr_greedy[0] = p_matrix[row_ind_greedy[0]][col_ind_greedy[0]]
             for i in range(1, n):
                 value_on_i_stage = p_matrix[row_ind_greedy[i]][col_ind_greedy[i]]
-                s_arr_greedy[i] = s_arr_greedy[i-1] + value_on_i_stage/num_exp    # Деление для усреднения
-                err_arr_greedy[i] = abs(s_arr_max[i] - s_arr_greedy[i])/num_exp
-            result['Жадный алгоритм'] = s_arr_greedy
-            result['Погрешность жадного алг'] = err_arr_greedy
+                arr_greedy[i] = arr_greedy[i-1] + value_on_i_stage
+            s_arr_greedy += arr_greedy
 
         # 4. Бережливый алгоритм
         if is_thrifty:
             row_ind_thrifty, col_ind_thrifty = thrifty_algorithm(p_matrix)
-            s_arr_thrifty[0] = p_matrix[row_ind_thrifty[0]][col_ind_thrifty[0]] / num_exp
-            err_arr_thrifty[0] = abs(s_arr_thrifty[0] - s_arr_thrifty[0])/num_exp
+            arr_thrifty[0] = p_matrix[row_ind_thrifty[0]][col_ind_thrifty[0]]
             for i in range(1, n):
                 value_on_i_stage = p_matrix[row_ind_thrifty[i]][col_ind_thrifty[i]]
-                s_arr_thrifty[i] = s_arr_thrifty[i - 1] + value_on_i_stage / num_exp  # Деление для усреднения
-                err_arr_thrifty[i] = abs(s_arr_thrifty[i] - s_arr_thrifty[i]) / num_exp
-            result['Бережливый алгоритм'] = s_arr_greedy
-            result['Погрешность бережливого алг'] = err_arr_thrifty
+                arr_thrifty[i] = arr_thrifty[i - 1] + value_on_i_stage
+            s_arr_thrifty += arr_thrifty
 
-    # Добавить подписи и перенести это в plot()
-    # fig, ax = plt.subplots()
-    # ax.plot(s_arr_max, color='red', linestyle='--', marker='o')
-    # ax.plot(s_arr_min, color='blue', linestyle='--', marker='o')
-    # ax.plot(s_arr_greedy, color='orange', linestyle='--', marker='o')
-    # ax.plot(s_arr_thrifty, color='green', linestyle='--', marker='o')
-    # plt.show()
-    return result
+    s_arr_max = s_arr_max / num_exp
+    if is_venger_max:
+        target_funcs['Оптимальный макс'] = s_arr_max
+        results['Оптимальный макс'] = s_arr_max[n-1]
+    if is_venger_min:
+        s_arr_min = s_arr_min/num_exp
+        target_funcs['Оптимальный мин'] = s_arr_min
+        results['Оптимальный мин'] = s_arr_min[n-1]
+    if is_greedy:
+        s_arr_greedy = s_arr_greedy/num_exp
+        target_funcs['Жадный алгоритм'] = s_arr_greedy
+        results['Жадный алгоритм'] = s_arr_greedy[n-1]
+        results['Погрешность жадного алг'] = s_arr_max[n-1] - s_arr_greedy[n-1]
+    if is_thrifty:
+        s_arr_thrifty = s_arr_thrifty/num_exp
+        target_funcs['Бережливый алгоритм'] = s_arr_thrifty
+        results['Бережливый алгоритм'] = s_arr_thrifty[n-1]
+        results['Погрешность бережливого алг'] = s_arr_max[n-1] - s_arr_thrifty[n-1]
+
+    return target_funcs, results
 
 
 def run_application():
