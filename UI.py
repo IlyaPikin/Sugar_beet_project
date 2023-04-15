@@ -298,6 +298,10 @@ def get_normal_matrix():
     pass
 
 
+def open_error_with_empty_matr():
+    showerror(title="Ошибка!", message="Сначала заполните или сгенерируйте матрицу!")
+
+
 def open_error_with_gen():
     showerror(title="Ошибка!", message="Ошибка в выборе границ генерации!")
 
@@ -381,6 +385,9 @@ def matrix_valid():
 
 
 def calculate():
+    if not fields_matrix:
+        open_error_with_empty_matr()
+        return
     if not matrix_valid():
         open_error_with_calc()
         return
@@ -660,49 +667,76 @@ def plot(has_data, is_experiment):
 def display_right_frame(has_data, is_experiment):
     plot(has_data, is_experiment)
 
-    if is_experiment:
-        pass
-    else:
-        pass
-
     currentAlg = 0
     places = [(10, 470), (10, 490), (10, 510), (10, 530)]
 
-    if True:
-        res_work = ttk.Label(master=result_frame,
-                             text="Результат работы алгоритмов:",
-                             font=top_font
-                             )
-        res_work.place(x=0, y=450)
+    res_work = ttk.Label(master=result_frame,
+                         text="Результат работы алгоритмов:",
+                         font=top_font
+                         )
+    res_work.place(x=0, y=450)
 
+    if not is_experiment:
         if is_venger_max.get():
             venger_max_label = ttk.Label(master=result_frame,
-                                         text="Венгерский максимум: "
+                                         text="Венгерский максимум: {0}".format(results['Сумма (оптимальный макс)'])
                                          )
             venger_max_label.place(x=places[currentAlg][0], y=places[currentAlg][1])
             currentAlg += 1
         if is_venger_min.get():
             venger_min_label = ttk.Label(master=result_frame,
-                                         text="Венгерский минимум: "
+                                         text="Венгерский минимум: {0}".format(results['Сумма (оптимальный мин)'])
                                          )
             venger_min_label.place(x=places[currentAlg][0], y=places[currentAlg][1])
             currentAlg += 1
         if is_greedy.get():
             greedy_label = ttk.Label(master=result_frame,
-                                     text="Жадный: "
+                                     text="Жадный: {0}".format(results['Сумма (жадный алг)'])
+                                     )
+            greedy_label.place(x=places[currentAlg][0], y=places[currentAlg][1])
+            # greedy_label_error = ttk.Label(master=result_frame,
+            #                                text="Погрешность: {0}".format()
+            #                                )
+            # greedy_label_error.place(x=places[currentAlg][0] + 200, y=places[currentAlg][1])
+            currentAlg += 1
+        if is_thrifty.get():
+            thrifty_label = ttk.Label(master=result_frame,
+                                      text="Бережливый: {0}".format(results['Сумма (бережливый алг)'])
+                                      )
+            thrifty_label.place(x=places[currentAlg][0], y=places[currentAlg][1])
+            # thrifty_label_error = ttk.Label(master=result_frame,
+            #                                text="Погрешность: ")
+
+            # thrifty_label_error.place(x=places[currentAlg][0] + 200, y=places[currentAlg][1])
+    else:
+        if is_venger_max.get():
+            venger_max_label = ttk.Label(master=result_frame,
+                                         text="Венгерский максимум: {0}".format(results['Оптимальный макс'])
+                                         )
+            venger_max_label.place(x=places[currentAlg][0], y=places[currentAlg][1])
+            currentAlg += 1
+        if is_venger_min.get():
+            venger_min_label = ttk.Label(master=result_frame,
+                                         text="Венгерский минимум: {0}".format(results['Оптимальный мин'])
+                                         )
+            venger_min_label.place(x=places[currentAlg][0], y=places[currentAlg][1])
+            currentAlg += 1
+        if is_greedy.get():
+            greedy_label = ttk.Label(master=result_frame,
+                                     text="Жадный: {0}".format(results['Жадный алгоритм'])
                                      )
             greedy_label.place(x=places[currentAlg][0], y=places[currentAlg][1])
             greedy_label_error = ttk.Label(master=result_frame,
-                                           text="Погрешность: "
+                                           text="Погрешность: {0}".format(results['Погрешность жадного алг'])
                                            )
             greedy_label_error.place(x=places[currentAlg][0] + 200, y=places[currentAlg][1])
             currentAlg += 1
         if is_thrifty.get():
             thrifty_label = ttk.Label(master=result_frame,
-                                      text="Бережливый: "
+                                      text="Бережливый: {0}".format(results['Бережливый алгоритм'])
                                       )
             thrifty_label_error = ttk.Label(master=result_frame,
-                                           text="Погрешность: ")
+                                           text="Погрешность: {0}".format(results['Погрешность бережливого алг']))
             thrifty_label.place(x=places[currentAlg][0], y=places[currentAlg][1])
             thrifty_label_error.place(x=places[currentAlg][0] + 200, y=places[currentAlg][1])
 
