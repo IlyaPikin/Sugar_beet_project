@@ -257,8 +257,16 @@ def dismiss(window):
 
 def load_matrix_from_file():
     global n_choice, p_matrix, fields_matrix, is_loaded_from_file
-    filepath = filedialog.askopenfilename()
-    df = pd.read_excel(filepath, header=None)
+    filepath = filedialog.askopenfilename(filetypes=[("Text Files", "*.txt"), ("Excel Files", "*.xlsx")])
+    # filepath = './something.xlsx'
+    if filepath == "":
+        return
+    try:
+        df = pd.read_excel(filepath, header=None)
+    except Exception as e:
+        open_error_with_bad_file()
+        return
+
     matrix = np.array(df)
 
     # Здесь должны быть и другие проверки на валидность матрицы!
@@ -277,17 +285,29 @@ def load_matrix_from_file():
         raise Exception('Матрица из файла неквадратная!')
 
 
-def save_matrix_in_file():
-    # ПОЛУЧИТЬ filepath из функции!
-    filepath = './матрица2.xlsx'    # это удалить
+def open_error_with_bad_file():
+    showerror(title="Ошибка!", message="Данного файла не существует или тип файла не соответствует требуемуму типу!")
+
+
+def save_matrix_coef():
+
+    if not fields_matrix:
+        open_error_with_empty_matr()
+        return
+    # filepath = './матрица2.xlsx'    # это удалить
+    filepath = filedialog.asksaveasfilename(filetypes=[("Text Files", "*.txt"), ("Excel Files", "*.xlsx")])
+    if filepath == "":
+        return
+    if filepath.find(".txt") or filepath.find(".xlsx"):
+        filepath+=".xlsx"
+    if filepath == "":
+        return
     df = pd.DataFrame(p_matrix)
-    df.to_excel(filepath, index=False, header=False)
-
-
-def save_res_in_table():
-    filepath = filedialog.askopenfilename()
-    df = pd.DataFrame(results)
-    df.to_excel(filepath)
+    try:
+        df.to_excel(filepath, index=False, header=False)
+    except Exception as e:
+        open_error_with_bad_file()
+        return
 
 
 def save_res_in_graph():
@@ -299,7 +319,7 @@ def get_normal_matrix():
 
 
 def open_error_with_empty_matr():
-    showerror(title="Ошибка!", message="Сначала заполните или сгенерируйте матрицу!")
+    showerror(title="Ошибка!", message="Матрица коэффициентов пуста!")
 
 
 def open_error_with_gen():
@@ -398,7 +418,12 @@ def calculate():
     display_right_frame(has_data=True, is_experiment=False)
 
 def save_results():
-    pass
+    filepath = filedialog.asksaveasfilename()
+    try:
+        pass # попытка записи в файл
+    except Exception as e:
+        open_error_with_bad_file()
+        return
 
 def get_row_matrix(row):
     result = ""
@@ -408,6 +433,9 @@ def get_row_matrix(row):
 
 
 def show_matrix():
+    if not fields_matrix:
+        open_error_with_empty_matr()
+        return
     window = Toplevel()
     window.title("Матрица")
     window.geometry("400x400")
@@ -486,7 +514,7 @@ def change_choice(newVal):
     fields_matrix.clear()
     for row in range(n_choice):
         for column in range(n_choice):
-            fields_matrix.append(DoubleVar())
+            fields_matrix.append(StringVar())
     rerun_left_frame()
     display_left_screen_down()
 
@@ -593,7 +621,7 @@ def display_left_screen_down():
         else:
             for row in range(n_choice):
                 for column in range(n_choice):
-                    value = DoubleVar()
+                    value = StringVar()
                     field = ttk.Entry(master=matrix_frame,
                                       width=10,
                                       textvariable=value,
@@ -612,7 +640,7 @@ file_menu = Menu(tearoff=0)
 save_menu = Menu(tearoff=0)
 setting_menu = Menu(tearoff=0)
 
-save_menu.add_command(label="Сохранить таблицу погрешностей", command=save_res_in_table)
+save_menu.add_command(label="Сохранить матрицу коэффициентов", command=save_matrix_coef)
 save_menu.add_command(label="Сохранить ", command=save_res_in_graph)
 
 file_menu.add_command(label="Загрузить матрицу из файла", command=load_matrix_from_file)
@@ -669,11 +697,16 @@ def display_right_frame(has_data, is_experiment):
 
     currentAlg = 0
     places = [(10, 470), (10, 490), (10, 510), (10, 530)]
-
-    res_work = ttk.Label(master=result_frame,
-                         text="Результат работы алгоритмов:",
+    if is_experiment:
+        res_work = ttk.Label(master=result_frame,
+                         text="Значения усреднённых целевых функций:",
                          font=top_font
                          )
+    else:
+        res_work = ttk.Label(master=result_frame,
+                             text="Результат работы алгоритмов:",
+                             font=top_font
+                             )
     res_work.place(x=0, y=450)
 
     if not is_experiment:
@@ -727,7 +760,7 @@ def display_right_frame(has_data, is_experiment):
                                      )
             greedy_label.place(x=places[currentAlg][0], y=places[currentAlg][1])
             greedy_label_error = ttk.Label(master=result_frame,
-                                           text="Погрешность: {0}".format(results['Погрешность жадного алг'])
+                                           text="Относительная погрешность: {0}".format(results['Погрешность жадного алг'])
                                            )
             greedy_label_error.place(x=places[currentAlg][0] + 200, y=places[currentAlg][1])
             currentAlg += 1
@@ -736,7 +769,7 @@ def display_right_frame(has_data, is_experiment):
                                       text="Бережливый: {0}".format(results['Бережливый алгоритм'])
                                       )
             thrifty_label_error = ttk.Label(master=result_frame,
-                                           text="Погрешность: {0}".format(results['Погрешность бережливого алг']))
+                                           text="Относительная погрешность: {0}".format(results['Погрешность бережливого алг']))
             thrifty_label.place(x=places[currentAlg][0], y=places[currentAlg][1])
             thrifty_label_error.place(x=places[currentAlg][0] + 200, y=places[currentAlg][1])
 
