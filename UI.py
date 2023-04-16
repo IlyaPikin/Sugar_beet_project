@@ -439,7 +439,7 @@ def calculate():
         for i in range(n_choice):
             for j in range(n_choice):
                 str_value = fields_matrix[i * n_choice + j].get() # Почему не обновляются значения, введенные юзером???
-               # print(str_value + "  ")
+                print(str_value + "  ")
                 float_value = try_to_get_float(str_value)
                 matrix[i][j] = float_value
     except Exception as str_exception:
@@ -560,7 +560,8 @@ def change_choice(newVal):
     fields_matrix.clear()
     for row in range(n_choice):
         for column in range(n_choice):
-            fields_matrix.append(StringVar(value='0'))
+            value = StringVar(value="0")
+            fields_matrix.append(value)
     rerun_left_frame()
     display_left_screen_down()
 
@@ -654,7 +655,7 @@ def display_left_screen_down():
         dif_x = 90
         start_y = 350
         dif_y = 25
-        if is_generated_by_random or is_loaded_from_file:
+        if fields_matrix:
             for row in range(n_choice):
                 for column in range(n_choice):
                     field = ttk.Entry(master=matrix_frame,
