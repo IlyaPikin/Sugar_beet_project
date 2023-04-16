@@ -1,5 +1,4 @@
 import numpy as np
-# import random
 
 
 # Содержание неорганики K, Na, N (столбцы) в 6 сортах свёклы (строки)
@@ -16,12 +15,6 @@ inorganic_in_beet_sorts = np.array([
 def get_rand_matrix(n: int, a_low: float = 0.1893, a_high: float = 0.2252, b_low: float = 0.8, b_high: float = 1.):
     a_column = np.random.uniform(a_low, a_high, (n, 1))
     b_matrix = np.random.uniform(b_low, b_high, (n, n-1))
-
-    # a_array = [[round(random.uniform(a_low, a_high), 5)] for _ in range(n)]
-    # b_array = [[round(random.uniform(b_low, b_high), 3) for _ in range(n-1)] for _ in range(n)]
-    #
-    # a_column = np.array(a_array)
-    # b_matrix = np.array(b_array)
 
     zero_addition = np.zeros((n, n-1))
     p_matrix = np.concatenate((a_column, zero_addition), axis=1)

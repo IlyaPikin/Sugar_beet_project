@@ -69,7 +69,7 @@ top_font = font.Font(weight="bold", size=12)
 medium_font = font.Font(weight="bold", size=10)
 cell_font = font.Font(size=13)
 
-n_choice = 10
+n_choice = 5
 fields_matrix = []  # В ней хранятся инпут поля гуя
 p_matrix = np.array([])  # полноценная матрица
 matrix_show_button_onscreen = False
@@ -90,9 +90,9 @@ is_venger_min = BooleanVar(value=False)
 is_greedy = BooleanVar(value=False)
 is_thrifty = BooleanVar(value=False)
 
-count_series = IntVar(value=10)
+count_series = IntVar(value=50)
 
-is_experiment = False
+#is_experiment = False
 is_calculating = False
 
 err_msg_a_min = StringVar()
@@ -326,8 +326,7 @@ def save_matrix_coef():
         return
     if filepath.find(".xlsx") == -1:
         filepath += ".xlsx"
-    if filepath == "":
-        return
+
     df = pd.DataFrame(p_matrix)
     try:
         df.to_excel(filepath, index=False, header=False)
@@ -340,11 +339,6 @@ def save_res_in_graph():
     filepath = filedialog.asksaveasfilename(defaultextension=".jpg",
                                             filetypes=[("JPG Files", "*.jpg"),("PDF Files", "*.pdf"), ("PNG Files", "*.png")])
     plot_to_save.savefig(filepath)
-
-
-
-def get_normal_matrix():
-    pass
 
 
 def open_error_with_empty_matr():
@@ -396,11 +390,12 @@ def start_experiments():
     if not valid_series():
         open_error_with_series()
         return
-    global target_funcs, results
+    global target_funcs, results, is_calculating
     target_funcs, results = run_experiments(n_choice, count_series.get(), neorganic_on.get(),
                               is_venger_max.get(), is_venger_min.get(), is_greedy.get(), is_thrifty.get(),
                               a_min.get(), a_max.get(), b_min.get(), b_max.get()
                               )
+    is_calculating = False
     rerun_right_frame()
     display_right_frame(has_data=True, is_experiment=True)
 
@@ -430,7 +425,7 @@ def rerun_right_frame():
 
 
 def calculate():
-    global target_funcs, results, p_matrix, fields_matrix
+    global target_funcs, results, p_matrix, fields_matrix, is_calculating
     if not fields_matrix:
         open_error_with_empty_matr()
         return
@@ -438,8 +433,7 @@ def calculate():
     try:
         for i in range(n_choice):
             for j in range(n_choice):
-                str_value = fields_matrix[i * n_choice + j].get() # Почему не обновляются значения, введенные юзером???
-                print(str_value + "  ")
+                str_value = fields_matrix[i * n_choice + j].get()
                 float_value = try_to_get_float(str_value)
                 matrix[i][j] = float_value
     except Exception as str_exception:
@@ -449,6 +443,7 @@ def calculate():
     p_matrix = matrix
     target_funcs, results = run_calculate(p_matrix, is_venger_max.get(), is_venger_min.get(),
                                             is_greedy.get(), is_thrifty.get())
+    is_calculating = True
     rerun_right_frame()
     display_right_frame(has_data=True, is_experiment=False)
 
@@ -461,10 +456,11 @@ def save_results():
         return
     if filepath.find(".xlsx") == -1:
         filepath += ".xlsx"
-    if filepath == "":
-        return
     try:
-        df = pd.DataFrame(results)
+        if is_calculating:
+            df = pd.DataFrame(results)
+        else:   # in case it was experiments
+            df = pd.DataFrame(results, index=[0])
         df.to_excel(filepath, index=False)
     except Exception as e:
         open_error('Ошибка записи результатов в файл.')
