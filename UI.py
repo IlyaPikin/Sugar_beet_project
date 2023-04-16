@@ -1,8 +1,11 @@
 import random
+import re
 from tkinter import *
 from tkinter import ttk     # подключаем пакет ttk
 from tkinter import filedialog
 from tkinter import font
+
+import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 import matplotlib
@@ -43,7 +46,7 @@ matrix_frame = ttk.Frame(master=root,
                          )
 
 result_frame = ttk.Frame(master=root,
-                         width=503,
+                         width=505,
                          height=600,
                          borderwidth=1,
                          relief=SOLID
@@ -97,6 +100,8 @@ err_msg_a_max = StringVar()
 err_msg_b_min = StringVar()
 err_msg_b_max = StringVar()
 
+plot_to_save = Figure(figsize=(5, 4.5),
+                 dpi=100)
 
 ###################### Шаблоны функций ########################
 
@@ -245,11 +250,17 @@ def is_valid_b_max(new_val):
         return True
 
 
+def is_valid_input_field(new_value):
+    pattern = r'^[\d\/\.,]*$'
+    # pattern = r'^[\d\/\.,]+$' - если сделать +, то поле нельзя будет оставить пустым. Со зведочкой поле может остаться пустым
+    return bool(re.match(pattern, new_value))
+
+
 check_a_min = (root.register(is_valid_a_min), "%P")
 check_a_max = (root.register(is_valid_a_max), "%P")
 check_b_min = (root.register(is_valid_b_min), "%P")
 check_b_max = (root.register(is_valid_b_max), "%P")
-
+check_field_matr = (root.register(is_valid_input_field), "%P")
 
 def dismiss(window):
     window.grab_release()
@@ -258,7 +269,7 @@ def dismiss(window):
 
 def load_matrix_from_file():
     global n_choice, p_matrix, fields_matrix, is_loaded_from_file
-    filepath = filedialog.askopenfilename(filetypes=[("Excel Files", "*.xlsx")])
+    filepath = filedialog.askopenfilename(defaultextension=".xlsl", filetypes=[("Excel Files", "*.xlsx")])
     # filepath = './something.xlsx'
     # Попытка считать данные из файла
     if filepath == "":
@@ -326,7 +337,10 @@ def save_matrix_coef():
 
 
 def save_res_in_graph():
-    filepath = filedialog.asksaveasfilename()
+    filepath = filedialog.asksaveasfilename(defaultextension=".jpg",
+                                            filetypes=[("JPG Files", "*.jpg"),("PDF Files", "*.pdf"), ("PNG Files", "*.png")])
+    plot_to_save.savefig(filepath)
+
 
 
 def get_normal_matrix():
@@ -425,6 +439,7 @@ def calculate():
         for i in range(n_choice):
             for j in range(n_choice):
                 str_value = fields_matrix[i * n_choice + j].get() # Почему не обновляются значения, введенные юзером???
+               # print(str_value + "  ")
                 float_value = try_to_get_float(str_value)
                 matrix[i][j] = float_value
     except Exception as str_exception:
@@ -646,6 +661,8 @@ def display_left_screen_down():
                                       width=10,
                                       textvariable=fields_matrix[row * n_choice + column],
                                       justify=CENTER,
+                                      validatecommand=check_field_matr,
+                                      validate="key",
                                       font=cell_font
                                       )
                     field.place(x=start_x + dif_x * column, y=start_y + dif_y * row)
@@ -657,6 +674,8 @@ def display_left_screen_down():
                                       width=10,
                                       textvariable=value,
                                       justify=CENTER,
+                                      validatecommand=check_field_matr,
+                                      validate="key",
                                       font=cell_font
                                       )
                     fields_matrix.append(value)
@@ -672,19 +691,13 @@ save_menu = Menu(tearoff=0)
 setting_menu = Menu(tearoff=0)
 
 save_menu.add_command(label="Сохранить матрицу коэффициентов", command=save_matrix_coef)
-save_menu.add_command(label="Сохранить ", command=save_res_in_graph)
+save_menu.add_command(label="Сохранить график динамики целевых функций", command=save_res_in_graph)
 
 file_menu.add_command(label="Загрузить матрицу из файла", command=load_matrix_from_file)
 
 file_menu.add_cascade(label="Сохранить...", menu=save_menu)
 main_menu.add_cascade(label="Файл", menu=file_menu)
 root.config(menu=main_menu)
-
-
-
-
-
-
 
 
 ################################### RIGHT FRAME ########################################
@@ -698,7 +711,8 @@ def plot(has_data, is_experiment):
               'Жадный алгоритм': 'orange',
               'Бережливый алгоритм': 'green'
               }
-
+    global plot_to_save
+    plot_to_save = fig
     plot1 = fig.add_subplot(111)
     if has_data:
         # plotting the graph
