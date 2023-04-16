@@ -1,5 +1,5 @@
 import numpy as np
-import random
+# import random
 
 
 # Содержание неорганики K, Na, N (столбцы) в 6 сортах свёклы (строки)
@@ -29,6 +29,10 @@ def get_rand_matrix(n: int, a_low: float = 0.1893, a_high: float = 0.2252, b_low
     for i in range(n):
         for j in range(1, n):
             p_matrix[i][j] = p_matrix[i][j-1]*b_matrix[i][j-1]
+
+    for i in range(n):
+        for j in range(n):
+            p_matrix[i][j] = round(p_matrix[i][j], 5)
 
     return p_matrix
 

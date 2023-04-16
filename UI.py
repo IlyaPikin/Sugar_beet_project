@@ -12,6 +12,7 @@ NavigationToolbar2Tk)
 from matrix_generation import *
 from application import *
 from tkinter.messagebox import showerror, showwarning, showinfo
+from fourFn import try_to_get_float
 
 ###################### Настройки #############################
 
@@ -257,49 +258,63 @@ def dismiss(window):
 
 def load_matrix_from_file():
     global n_choice, p_matrix, fields_matrix, is_loaded_from_file
-    filepath = filedialog.askopenfilename(filetypes=[("Text Files", "*.txt"), ("Excel Files", "*.xlsx")])
+    filepath = filedialog.askopenfilename(filetypes=[("Excel Files", "*.xlsx")])
     # filepath = './something.xlsx'
+    # Попытка считать данные из файла
     if filepath == "":
         return
     try:
-        df = pd.read_excel(filepath, header=None)
+        df = pd.read_excel(filepath, header=None, dtype=str)
     except Exception as e:
         open_error_with_bad_file()
         return
 
-    matrix = np.array(df)
+    data = np.array(df, dtype=str)
+    matrix = np.array([], dtype=float)
+    fields_matrix_list = []     # Будущая fields_matrix
+    # Проверка данных на корректность и заполнение matrix
+    try:
+        if df.ndim != 2 or df.shape[0] != df.shape[1]:
+            raise Exception('Недопустимые размеры матрицы: матрица должна быть квадратной с размерностью n > 1!')
 
-    # Здесь должны быть и другие проверки на валидность матрицы!
+        matrix = np.resize(matrix, (data.shape[0], data.shape[0]))
+        for row_ind in range(data.shape[0]):
+            for column_ind in range(data.shape[1]):
+                str_value = data[row_ind][column_ind]
+                float_value = try_to_get_float(str_value)
+                matrix[row_ind][column_ind] = float_value
+                fields_matrix_list.append(str_value)     # Записываем строковый value в fields_matrix_list
+    except Exception as str_exception:
+        open_error(str_exception.args[0])
+        return
 
-    if matrix.shape[0] == matrix.shape[1]:
-        is_loaded_from_file = True
-        n_choice = matrix.shape[0]
-        p_matrix = matrix
-        fields_matrix.clear()
-        array_1d = p_matrix.flatten()  # Уменьшение размерности до 1
-        fields_matrix = [DoubleVar(value=el) for el in array_1d]  # Приведение типов
+    is_loaded_from_file = True
+    n_choice = data.shape[0]
+    p_matrix = matrix
+    fields_matrix.clear()
+    fields_matrix = [StringVar(value=el) for el in fields_matrix_list]
 
-        rerun_left_frame()
-        display_left_screen_down()
-    else:
-        raise Exception('Матрица из файла неквадратная!')
+    rerun_left_frame()
+    display_left_screen_down()
+
 
 
 def open_error_with_bad_file():
-    showerror(title="Ошибка!", message="Данного файла не существует или тип файла не соответствует требуемуму типу!")
+    showerror(title="Ошибка!", message="Данного файла не существует или тип файла не соответствует требуемому типу!")
 
+def open_error(msg: str):
+    showerror(title="Ошибка!", message=msg)
 
 def save_matrix_coef():
-
     if not fields_matrix:
         open_error_with_empty_matr()
         return
     # filepath = './матрица2.xlsx'    # это удалить
-    filepath = filedialog.asksaveasfilename(filetypes=[("Text Files", "*.txt"), ("Excel Files", "*.xlsx")])
+    filepath = filedialog.asksaveasfilename(filetypes=[("Excel Files", "*.xlsx")])
     if filepath == "":
         return
-    if filepath.find(".txt") or filepath.find(".xlsx"):
-        filepath+=".xlsx"
+    if filepath.find(".xlsx") == -1:
+        filepath += ".xlsx"
     if filepath == "":
         return
     df = pd.DataFrame(p_matrix)
@@ -349,7 +364,7 @@ def gen_random_matr():
         p_matrix = add_inorganic(p_matrix)
 
     array_1d = p_matrix.flatten()   # Уменьшение размерности до 1
-    fields_matrix = [DoubleVar(value=el) for el in array_1d]    # Приведение типов
+    fields_matrix = [StringVar(value="{0:.5f}".format(el)) for el in array_1d]    # Приведение типов
 
     rerun_left_frame()
     display_left_screen_down()
@@ -400,30 +415,46 @@ def rerun_right_frame():
     result_frame.place(x=575, y=100)
 
 
-def matrix_valid():
-    return True     # Пока написал тру, чтобы затестить
-
-
 def calculate():
+    global target_funcs, results, p_matrix, fields_matrix
     if not fields_matrix:
         open_error_with_empty_matr()
         return
-    if not matrix_valid():
-        open_error_with_calc()
+    matrix = np.zeros((n_choice, n_choice))
+    try:
+        for i in range(n_choice):
+            for j in range(n_choice):
+                str_value = fields_matrix[i * n_choice + j].get() # Почему не обновляются значения, введенные юзером???
+                float_value = try_to_get_float(str_value)
+                matrix[i][j] = float_value
+    except Exception as str_exception:
+        open_error(str_exception.args[0])
         return
-    global target_funcs, results, p_matrix
+
+    p_matrix = matrix
     target_funcs, results = run_calculate(p_matrix, is_venger_max.get(), is_venger_min.get(),
                                             is_greedy.get(), is_thrifty.get())
     rerun_right_frame()
     display_right_frame(has_data=True, is_experiment=False)
 
 def save_results():
-    filepath = filedialog.asksaveasfilename()
-    try:
-        pass # попытка записи в файл
-    except Exception as e:
-        open_error_with_bad_file()
+    if not results:
+        open_error('Результаты не были получены! Выберете необходимые алгоритмы!')
         return
+    filepath = filedialog.asksaveasfilename(filetypes=[("Excel Files", "*.xlsx")])
+    if filepath == "":
+        return
+    if filepath.find(".xlsx") == -1:
+        filepath += ".xlsx"
+    if filepath == "":
+        return
+    try:
+        df = pd.DataFrame(results)
+        df.to_excel(filepath, index=False)
+    except Exception as e:
+        open_error('Ошибка записи результатов в файл.')
+        return
+
 
 def get_row_matrix(row):
     result = ""
@@ -514,7 +545,7 @@ def change_choice(newVal):
     fields_matrix.clear()
     for row in range(n_choice):
         for column in range(n_choice):
-            fields_matrix.append(StringVar())
+            fields_matrix.append(StringVar(value='0'))
     rerun_left_frame()
     display_left_screen_down()
 
@@ -621,7 +652,7 @@ def display_left_screen_down():
         else:
             for row in range(n_choice):
                 for column in range(n_choice):
-                    value = StringVar()
+                    value = StringVar(value='0')
                     field = ttk.Entry(master=matrix_frame,
                                       width=10,
                                       textvariable=value,

@@ -8,10 +8,11 @@ def save_res_in_table(results: dict[str, float]):
 
 def save_matrix_in_file(matrix: np.ndarray):
     # ПОЛУЧИТЬ filepath из функции!
-    filepath = './матрица2.xlsx'
+    filepath = './матрица3.xlsx'
     df = pd.DataFrame(matrix)
     df.to_excel(filepath, index=False, header=False)
 def load_matrix_from_file():
-    filepath = filedialog.askopenfilename()
+    # filepath = filedialog.askopenfilename()
+    filepath = './матрица2.xlsx'
     df = pd.read_excel(filepath, header=None)
     return np.array(df)
