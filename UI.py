@@ -20,14 +20,16 @@ from fourFn import try_to_get_float
 ###################### Настройки #############################
 
 width_screen = 1100
-height_screen = 720
+height_screen = 680
 
 ###################### Создание окна #######################
 
 root = Tk()
 root.title("Sugar Beet")
-root.geometry("{0}x{1}+350+200".format(width_screen, height_screen))
-root.resizable(False, False)  # для того, чтобы запретить растягивание
+w = root.winfo_screenwidth() # ширина экрана
+h = root.winfo_screenheight() # высота экрана
+root.geometry(f'{width_screen}x{height_screen}+{(w-1100)//2}+{(h-720)//2}')
+root.resizable(width=False, height=False)
 
 ################ Создание фреймов ############################
 
@@ -40,14 +42,14 @@ top_frame = ttk.Frame(master=root,
 
 matrix_frame = ttk.Frame(master=root,
                          width=500,
-                         height=600,
+                         height=550,
                          borderwidth=1,
                          relief=SOLID
                          )
 
 result_frame = ttk.Frame(master=root,
                          width=505,
-                         height=600,
+                         height=550,
                          borderwidth=1,
                          relief=SOLID
                          )
@@ -405,7 +407,7 @@ def rerun_left_frame():
     matrix_frame.destroy()
     matrix_frame = ttk.Frame(master=root,
                              width=500,
-                             height=600,
+                             height=550,
                              borderwidth=1,
                              relief=SOLID,
                              )
@@ -417,7 +419,7 @@ def rerun_right_frame():
     result_frame.destroy()
     result_frame = ttk.Frame(master=root,
                              width=505,
-                             height=600,
+                             height=550,
                              borderwidth=1,
                              relief=SOLID
                              )
@@ -645,11 +647,11 @@ def display_left_screen_down():
                                   command=show_matrix)
 
     if n_choice > 5:
-        show_matr_button.place(x=190, y=565)
+        show_matr_button.place(x=190, y=515)
     else:
         start_x = 20
         dif_x = 90
-        start_y = 350
+        start_y = 330
         dif_y = 25
         if fields_matrix:
             for row in range(n_choice):
@@ -700,7 +702,7 @@ root.config(menu=main_menu)
 ################################### RIGHT FRAME ########################################
 
 def plot(has_data, is_experiment):
-    fig = Figure(figsize=(5, 4.5),
+    fig = Figure(figsize=(5, 4),
                  dpi=100)
 
     colors = {'Оптимальный макс': 'red',
@@ -738,7 +740,7 @@ def display_right_frame(has_data, is_experiment):
     plot(has_data, is_experiment)
 
     currentAlg = 0
-    places = [(10, 470), (10, 490), (10, 510), (10, 530)]
+    places = [(10, 420), (10, 440), (10, 460), (10, 480)]
     if is_experiment:
         res_work = ttk.Label(master=result_frame,
                          text="Значения усреднённых целевых функций:",
@@ -749,7 +751,7 @@ def display_right_frame(has_data, is_experiment):
                              text="Результат работы алгоритмов:",
                              font=top_font
                              )
-    res_work.place(x=0, y=450)
+    res_work.place(x=0, y=400)
 
     if not is_experiment:
         if is_venger_max.get():
@@ -818,7 +820,7 @@ def display_right_frame(has_data, is_experiment):
     button_get_res = ttk.Button(master=result_frame,
                                 text="Сохранить результаты",
                                 command=save_results)
-    button_get_res.place(x=190, y=565)
+    button_get_res.place(x=190, y=515)
 
 display_right_frame(False, False)
 
