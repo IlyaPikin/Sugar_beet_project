@@ -452,6 +452,8 @@ def calculate():
     is_calculating = True
     rerun_right_frame()
     display_right_frame(has_data=True, is_experiment=False)
+    rerun_left_frame()
+    display_left_screen_down(after_calculate=True)
 
 def save_results():
     if not results:
@@ -567,7 +569,7 @@ def change_choice(newVal):
     rerun_left_frame()
     display_left_screen_down()
 
-def display_left_screen_down():
+def display_left_screen_down(after_calculate=False):
     ####################################### ВЕРХНЯЯ ЧАСТЬ #######################################
     global label_n_choice
 
@@ -657,7 +659,45 @@ def display_left_screen_down():
         dif_x = 90
         start_y = 330
         dif_y = 25
-        if fields_matrix:
+        if fields_matrix and after_calculate and is_venger_max.get():
+            columns = results['Индекс столбца (оптимальный макс)']
+            rows = results['Индекс строки (оптимальный макс)']
+            for row in range(n_choice):
+                for column in range(n_choice):
+                    if column == columns[np.where(rows == row)]:
+                        estyle = ttk.Style()
+                        estyle.layout("EntryStyle.TEntry",
+                                      [('Entry.plain.field', {'children': [(
+                                          'Entry.background', {'children': [(
+                                              'Entry.padding', {'children': [(
+                                                  'Entry.textarea', {'sticky': 'nswe'})],
+                                                  'sticky': 'nswe'})], 'sticky': 'nswe'})],
+                                          'border': '3', 'sticky': 'nswe'})])
+                        estyle.configure("EntryStyle.TEntry",
+                                         background="green",
+                                         foreground="black",
+                                         fieldbackground="green")
+                        field = ttk.Entry(master=matrix_frame,
+                                          width=10,
+                                          textvariable=fields_matrix[row * n_choice + column],
+                                          justify=CENTER,
+                                          validatecommand=check_field_matr,
+                                          validate="key",
+                                          font=cell_font,
+                                          style="EntryStyle.TEntry"
+                                          )
+                        field.place(x=start_x + dif_x * column, y=start_y + dif_y * row)
+                    else:
+                        field = ttk.Entry(master=matrix_frame,
+                                          width=10,
+                                          textvariable=fields_matrix[row * n_choice + column],
+                                          justify=CENTER,
+                                          validatecommand=check_field_matr,
+                                          validate="key",
+                                          font=cell_font
+                                          )
+                        field.place(x=start_x + dif_x * column, y=start_y + dif_y * row)
+        elif fields_matrix:
             for row in range(n_choice):
                 for column in range(n_choice):
                     field = ttk.Entry(master=matrix_frame,
