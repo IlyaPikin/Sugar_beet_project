@@ -84,7 +84,7 @@ results = {}        # Основные результаты
 
 a_min = DoubleVar(value=0.1893)
 a_max = DoubleVar(value=0.2252)
-b_min = DoubleVar(value=0.8)
+b_min = DoubleVar(value=0.98)
 b_max = DoubleVar(value=1.0)
 
 is_venger_max = BooleanVar(value=False)
@@ -339,7 +339,11 @@ def save_matrix_coef():
 
 def save_res_in_graph():
     filepath = filedialog.asksaveasfilename(defaultextension=".jpg",
-                                            filetypes=[("JPG Files", "*.jpg"),("PDF Files", "*.pdf"), ("PNG Files", "*.png")])
+                                            filetypes=[("JPG Files", "*.jpg"),
+                                                       ("PDF Files", "*.pdf"),
+                                                       ("PNG Files", "*.png")])
+    if filepath == "":
+        return
     plot_to_save.savefig(filepath)
 
 
@@ -718,8 +722,8 @@ def plot(has_data, is_experiment):
         for key, value in target_funcs.items():
             if key != 'Погрешность бережливого алг' and key != 'Погрешность жадного алг':
                 plot_color = colors[key]
-                plot1.plot(value, label=key, color=plot_color, linestyle='--', marker='o', linewidth=0.7)
-        plot1.set_xlabel("Этапы переработки")
+                plot1.plot(value, label=key, color=plot_color, linestyle='--', linewidth=0.7)
+        plot1.set_xlabel("Этапы переработки (дни)")
         plot1.set_ylabel("Значения целевой функции")
         if not target_funcs == {}:
             plot1.legend(loc='lower right')
