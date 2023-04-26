@@ -26,7 +26,7 @@ def run_calculate(p_matrix: np.ndarray, is_venger_max: bool, is_venger_min: bool
         target_funcs['Оптимальный макс'] = arr_max
         results['Индекс столбца (оптимальный макс)'] = col_ind_max
         results['Индекс строки (оптимальный макс)'] = row_ind_max
-        results['Сумма (оптимальный макс)'] = round(p_matrix[row_ind_max, col_ind_max].sum(), 5)
+        results['Сумма (оптимальный макс)'] = round(p_matrix[row_ind_max, col_ind_max].sum(), 6)
 
     # 2. Оптимальный мин
     if is_venger_min:
@@ -38,7 +38,7 @@ def run_calculate(p_matrix: np.ndarray, is_venger_max: bool, is_venger_min: bool
         target_funcs['Оптимальный мин'] = arr_min
         results['Индекс столбца (оптимальный мин)'] = col_ind_min
         results['Индекс строки (оптимальный мин)'] = row_ind_min
-        results['Сумма (оптимальный мин)'] = round(p_matrix[row_ind_min, col_ind_min].sum(), 5)
+        results['Сумма (оптимальный мин)'] = round(p_matrix[row_ind_min, col_ind_min].sum(), 6)
 
     # 3. Жадный алгоритм
     if is_greedy:
@@ -50,7 +50,7 @@ def run_calculate(p_matrix: np.ndarray, is_venger_max: bool, is_venger_min: bool
         target_funcs['Жадный алгоритм'] = arr_greedy
         results['Индекс столбца (жадный алг)'] = col_ind_greedy
         results['Индекс строки (жадный алг)'] = row_ind_greedy
-        results['Сумма (жадный алг)'] = round(p_matrix[row_ind_greedy, col_ind_greedy].sum(), 5)
+        results['Сумма (жадный алг)'] = round(p_matrix[row_ind_greedy, col_ind_greedy].sum(), 6)
 
     # 4. Бережливый алгоритм
     if is_thrifty:
@@ -62,14 +62,16 @@ def run_calculate(p_matrix: np.ndarray, is_venger_max: bool, is_venger_min: bool
         target_funcs['Бережливый алгоритм'] = arr_thrifty
         results['Индекс столбца (бережливый алг)'] = col_ind_thrifty
         results['Индекс строки (бережливый алг)'] = row_ind_thrifty
-        results['Сумма (бережливый алг)'] = round(p_matrix[row_ind_thrifty, col_ind_thrifty].sum(), 5)
+        results['Сумма (бережливый алг)'] = round(p_matrix[row_ind_thrifty, col_ind_thrifty].sum(), 6)
 
     return target_funcs, results
 
 
 def run_experiments(n: int, num_exp: int, inorganic: bool,
                     is_venger_max: bool, is_venger_min: bool, is_greedy: bool, is_thrifty: bool,
-                    a_min: float, a_max: float, b_min: float, b_max: float
+                    a_min: float, a_max: float, b_min: float, b_max: float,
+                    k_low: float, na_low: float, n_low: float,
+                    k_high: float, na_high: float, n_high: float
                     ):
     # Результаты экспериментов
     target_funcs = {}
@@ -91,8 +93,9 @@ def run_experiments(n: int, num_exp: int, inorganic: bool,
         # ___Создание матрицы P___
         p_matrix = get_rand_matrix(n, a_min, a_max, b_min, b_max)
 
+        # Учёт связывания сахарозы с неорганикой
         if inorganic:
-            p_matrix = add_inorganic(p_matrix)      # учёт связывания сахарозы с неорганикой
+            p_matrix = add_inorganic(p_matrix, k_low, na_low, n_low, k_high, na_high, n_high)
 
         # ___Выполнение алгоритмов___
         # 1. Оптимальный макс
@@ -133,20 +136,20 @@ def run_experiments(n: int, num_exp: int, inorganic: bool,
     s_arr_max = s_arr_max / num_exp
     if is_venger_max:
         target_funcs['Оптимальный макс'] = s_arr_max
-        results['Оптимальный макс'] = round(s_arr_max[n-1], 5)
+        results['Оптимальный макс'] = round(s_arr_max[n-1], 6)
     if is_venger_min:
         s_arr_min = s_arr_min/num_exp
         target_funcs['Оптимальный мин'] = s_arr_min
-        results['Оптимальный мин'] = round(s_arr_min[n-1], 5)
+        results['Оптимальный мин'] = round(s_arr_min[n-1], 6)
     if is_greedy:
         s_arr_greedy = s_arr_greedy/num_exp
         target_funcs['Жадный алгоритм'] = s_arr_greedy
-        results['Жадный алгоритм'] = round(s_arr_greedy[n-1], 5)
-        results['Погрешность жадного алг'] = round(abs(s_arr_max[n-1] - s_arr_greedy[n-1])/s_arr_max[n-1], 5)
+        results['Жадный алгоритм'] = round(s_arr_greedy[n-1], 6)
+        results['Погрешность жадного алг'] = round(abs(s_arr_max[n-1] - s_arr_greedy[n-1])/s_arr_max[n-1], 6)
     if is_thrifty:
         s_arr_thrifty = s_arr_thrifty/num_exp
         target_funcs['Бережливый алгоритм'] = s_arr_thrifty
-        results['Бережливый алгоритм'] = round(s_arr_thrifty[n-1], 5)
-        results['Погрешность бережливого алг'] = round(abs(s_arr_max[n-1] - s_arr_thrifty[n-1])/s_arr_max[n-1], 5)
+        results['Бережливый алгоритм'] = round(s_arr_thrifty[n-1], 6)
+        results['Погрешность бережливого алг'] = round(abs(s_arr_max[n-1] - s_arr_thrifty[n-1])/s_arr_max[n-1], 6)
 
     return target_funcs, results

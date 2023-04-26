@@ -96,7 +96,7 @@ is_thrifty = BooleanVar(value=False)
 
 count_series = IntVar(value=50)
 
-#is_experiment = False
+
 is_calculating = False
 
 err_msg_a_min = StringVar()
@@ -616,7 +616,7 @@ def gen_random_matr():
                                  K_max.get(), Na_max.get(), N_max.get())
 
     array_1d = p_matrix.flatten()   # Уменьшение размерности до 1
-    fields_matrix = [StringVar(value="{0:.5f}".format(el)) for el in array_1d]    # Приведение типов
+    fields_matrix = [StringVar(value="{0:.6f}".format(el)) for el in array_1d]    # Приведение типов
 
     rerun_left_frame()
     display_left_screen_down()
@@ -637,7 +637,9 @@ def start_experiments():
     global target_funcs, results, is_calculating
     target_funcs, results = run_experiments(n_choice, count_series.get(), neorganic_on.get(),
                               is_venger_max.get(), is_venger_min.get(), is_greedy.get(), is_thrifty.get(),
-                              a_min.get(), a_max.get(), b_min.get(), b_max.get()
+                              a_min.get(), a_max.get(), b_min.get(), b_max.get(),
+                              K_min.get(), Na_min.get(), N_min.get(),
+                              K_max.get(), Na_max.get(), N_max.get()
                               )
     is_calculating = False
     rerun_right_frame()
@@ -746,7 +748,7 @@ def neorganic_change_but():
     global h
     window = Toplevel()
     window.title("Задание значений неорганики")
-    window.geometry(f'670x400+{(w - 670) // 2}+{(h - 400) // 2}')
+    window.geometry(f'670x270+{(w - 670) // 2}+{(h - 270) // 2}')
     window.protocol("WM_DELETE_WINDOW", lambda: close_neor_change_window(window))
     window.grab_set()
     start_x = 20
@@ -770,11 +772,11 @@ def neorganic_change_but():
     err_label_Na_max = ttk.Label(master=window, foreground='red', textvariable=err_msg_na_max)
 
     N_min_entry = ttk.Entry(master=window, textvariable=N_min, validatecommand=check_n_min, validate="key")
-    N_min_label = ttk.Label(master=window, text="Нижняя граница аминного азота (ммоль/100г свеклы)")
+    N_min_label = ttk.Label(master=window, text="Нижняя граница α-аминного азота (ммоль/100г свеклы)")
     err_label_N_min = ttk.Label(master=window, foreground='red', textvariable=err_msg_n_min)
 
     N_max_entry = ttk.Entry(master=window, textvariable=N_max, validatecommand=check_n_max, validate="key")
-    N_max_label = ttk.Label(master=window, text="Верхняя граница аминного азота (ммоль/100г свеклы)")
+    N_max_label = ttk.Label(master=window, text="Верхняя граница α-аминного азота (ммоль/100г свеклы)")
     err_label_N_max = ttk.Label(master=window, foreground='red', textvariable=err_msg_n_max)
 
 
@@ -953,9 +955,9 @@ def display_left_screen_down(after_calculate=False):
                                )
 
     neorganic_button = ttk.Button(master=matrix_frame,
-                               text="Задать значения неорганики",
+                               text="Изменить содержание неорганики",
                                command=neorganic_change_but,
-                               width=30
+                               width=32
                                )
     random_button.place(x=start_x, y=start_y + 7 * dif_y)
     neorganic_button.place(x=start_x + 190, y=start_y + 7 * dif_y)
@@ -1079,13 +1081,14 @@ def plot(has_data, is_experiment):
                 plot_color = colors[key]
                 plot1.plot(value, label=key, color=plot_color, linestyle='--', linewidth=0.7)
         plot1.set_xlabel("Этапы переработки (дни)")
-        plot1.set_ylabel("Значения целевой функции")
         if not target_funcs == {}:
             plot1.legend(loc='lower right')
         if is_experiment:
             plot1.set_title('Динамика усреднённых целевых функций', fontsize=11, fontweight='bold')
+            plot1.set_ylabel("Значения усреднённых целевых функций")
         else:
             plot1.set_title('Динамика целевых функций', fontsize=11, fontweight='bold')
+            plot1.set_ylabel("Значения целевых функций")
     else:
         plot1.plot()
 
