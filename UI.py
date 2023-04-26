@@ -272,32 +272,32 @@ def is_valid_k_min(new_val):
     if new_val == "":
         err_msg_k_min.set("Заполните поле!")
         neoranic_valid[0] = 0
-        return False
+        return True
     try:
         float(new_val)
     except ValueError:
         err_msg_k_min.set("Введите число!")
         neoranic_valid[0] = 0
-        return False
+        return True
     try:
         float(K_max.get())
     except Exception as e:
         err_msg_k_min.set("Верхняя граница не является числом!")
         neoranic_valid[0] = 0
-        return False
+        return True
     value = float(new_val)
     if value > K_max.get():
         err_msg_k_min.set("Значение больше верхней границы!")
         neoranic_valid[0] = 0
-        return False
+        return True
     elif value < 0.0:
         err_msg_k_min.set("Значение меньше 0!")
-        #right_border_value[2] = 0
-        return False
+        neoranic_valid[0] = 0
+        return True
     elif value > 100:
         err_msg_k_min.set("Значение больше 100!")
         neoranic_valid[0] = 0
-        return False
+        return True
     else:
         err_msg_k_min.set("")
         neoranic_valid[0] = 1
@@ -307,32 +307,32 @@ def is_valid_k_max(new_val):
     if new_val == "":
         err_msg_k_max.set("Заполните поле!")
         neoranic_valid[1] = 0
-        return False
+        return True
     try:
         float(new_val)
     except ValueError:
         err_msg_k_max.set("Введите число!")
         neoranic_valid[1] = 0
-        return False
+        return True
     try:
         float(K_min.get())
     except Exception as e:
         err_msg_k_max.set("Нижняя граница не является числом!")
         neoranic_valid[1] = 0
-        return False
+        return True
     value = float(new_val)
     if value < K_min.get():
         err_msg_k_max.set("Значение меньше нижней границы!")
         neoranic_valid[1] = 0
-        return False
+        return True
     elif value < 0.0:
         err_msg_k_max.set("Значение меньше 0!")
         neoranic_valid[1] = 0
-        return False
+        return True
     elif value > 100:
         err_msg_k_max.set("Значение больше 100!")
         neoranic_valid[1] = 0
-        return False
+        return True
     else:
         err_msg_k_max.set("")
         neoranic_valid[1] = 1
@@ -342,32 +342,32 @@ def is_valid_na_min(new_val):
     if new_val == "":
         err_msg_na_min.set("Заполните поле!")
         neoranic_valid[2] = 0
-        return False
+        return True
     try:
         float(new_val)
     except ValueError:
         err_msg_na_min.set("Введите число!")
         neoranic_valid[2] = 0
-        return False
+        return True
     try:
         float(Na_max.get())
     except Exception as e:
         err_msg_na_min.set("Верхняя граница не является числом!")
         neoranic_valid[2] = 00
-        return False
+        return True
     value = float(new_val)
     if value > Na_max.get():
         err_msg_na_min.set("Значение больше верхней границы!")
         neoranic_valid[2] = 0
-        return False
+        return True
     elif value < 0.0:
         err_msg_na_min.set("Значение меньше 0!")
         neoranic_valid[2] = 0
-        return False
+        return True
     elif value > 100:
         err_msg_na_min.set("Значение больше 100!")
         neoranic_valid[2] = 0
-        return False
+        return True
     else:
         err_msg_na_min.set("")
         neoranic_valid[2] = 1
@@ -377,32 +377,32 @@ def is_valid_na_max(new_val):
     if new_val == "":
         err_msg_na_max.set("Заполните поле!")
         neoranic_valid[3] = 0
-        return False
+        return True
     try:
         float(new_val)
     except ValueError:
         err_msg_na_max.set("Введите число!")
         neoranic_valid[3] = 0
-        return False
+        return True
     try:
         float(Na_min.get())
     except Exception as e:
         err_msg_na_max.set("Нижняя граница не является числом!")
         neoranic_valid[3] = 0
-        return False
+        return True
     value = float(new_val)
     if value < Na_min.get():
         err_msg_na_max.set("Значение меньше нижней границы!")
         neoranic_valid[3] = 0
-        return False
+        return True
     elif value < 0.0:
         err_msg_na_max.set("Значение меньше 0!")
         neoranic_valid[3] = 0
-        return False
+        return True
     elif value > 100:
         err_msg_na_max.set("Значение больше 100!")
         neoranic_valid[3] = 0
-        return False
+        return True
     else:
         err_msg_na_max.set("")
         neoranic_valid[3] = 1
@@ -412,32 +412,32 @@ def is_valid_n_min(new_val):
     if new_val == "":
         err_msg_n_min.set("Заполните поле!")
         neoranic_valid[4] = 0
-        return False
+        return True
     try:
         float(new_val)
     except ValueError:
         err_msg_n_min.set("Введите число!")
         neoranic_valid[4] = 0
-        return False
+        return True
     try:
         float(N_max.get())
     except Exception as e:
         err_msg_n_min.set("Верхняя граница не является числом!")
         neoranic_valid[4] = 0
-        return False
+        return True
     value = float(new_val)
     if value > N_max.get():
         err_msg_n_min.set("Значение больше верхней границы!")
         neoranic_valid[4] = 0
-        return False
+        return True
     elif value < 0.0:
         err_msg_n_min.set("Значение меньше 0!")
         neoranic_valid[4] = 0
-        return False
+        return True
     elif value > 100:
         err_msg_n_min.set("Значение больше 100!")
         neoranic_valid[4] = 0
-        return False
+        return True
     else:
         err_msg_n_min.set("")
         neoranic_valid[4] = 1
@@ -447,32 +447,32 @@ def is_valid_n_max(new_val):
     if new_val == "":
         err_msg_n_max.set("Заполните поле!")
         neoranic_valid[5] = 0
-        return False
+        return True
     try:
         float(new_val)
     except ValueError:
         err_msg_n_max.set("Введите число!")
         neoranic_valid[5] = 0
-        return False
+        return True
     try:
         float(N_min.get())
     except Exception as e:
         err_msg_na_max.set("Нижняя граница не является числом!")
         neoranic_valid[5] = 0
-        return False
+        return True
     value = float(new_val)
     if value < N_min.get():
         err_msg_n_max.set("Значение меньше нижней границы!")
         neoranic_valid[5] = 0
-        return False
+        return True
     elif value < 0.0:
         err_msg_n_max.set("Значение меньше 0!")
         neoranic_valid[5] = 0
-        return False
+        return True
     elif value > 100:
         err_msg_n_max.set("Значение больше 100!")
         neoranic_valid[5] = 0
-        return False
+        return True
     else:
         err_msg_n_max.set("")
         neoranic_valid[5] = 1
@@ -753,27 +753,27 @@ def neorganic_change_but():
     start_y = 20
     dif_y = 25
     dif_x = 250
-    K_min_entry = ttk.Entry(master=window, textvariable=K_min, validatecommand=check_k_min, validate="focusout")
+    K_min_entry = ttk.Entry(master=window, textvariable=K_min, validatecommand=check_k_min, validate="key")
     K_min_label = ttk.Label(master=window, text="Нижняя граница калия(ммоль/100г свеклы)")
     err_label_k_min = ttk.Label(master=window, foreground='red', textvariable=err_msg_k_min)
 
-    K_max_entry = ttk.Entry(master=window, textvariable=K_max, validatecommand=check_k_max, validate="focusout")
+    K_max_entry = ttk.Entry(master=window, textvariable=K_max, validatecommand=check_k_max, validate="key")
     K_max_label = ttk.Label(master=window, text="Верхняя граница калия")
     err_label_k_max = ttk.Label(master=window, foreground='red', textvariable=err_msg_k_max)
 
-    Na_min_entry = ttk.Entry(master=window, textvariable=Na_min, validatecommand=check_na_min, validate="focusout")
+    Na_min_entry = ttk.Entry(master=window, textvariable=Na_min, validatecommand=check_na_min, validate="key")
     Na_min_label = ttk.Label(master=window, text="Нижняя граница натрия(ммоль/100г свеклы)")
     err_label_Na_min = ttk.Label(master=window, foreground='red', textvariable=err_msg_na_min)
 
-    Na_max_entry = ttk.Entry(master=window, textvariable=Na_max, validatecommand=check_na_max, validate="focusout")
+    Na_max_entry = ttk.Entry(master=window, textvariable=Na_max, validatecommand=check_na_max, validate="key")
     Na_max_label = ttk.Label(master=window, text="Верхняя граница натрия")
     err_label_Na_max = ttk.Label(master=window, foreground='red', textvariable=err_msg_na_max)
 
-    N_min_entry = ttk.Entry(master=window, textvariable=N_min, validatecommand=check_n_min, validate="focusout")
+    N_min_entry = ttk.Entry(master=window, textvariable=N_min, validatecommand=check_n_min, validate="key")
     N_min_label = ttk.Label(master=window, text="Нижняя граница аминного азота(ммоль/100г свеклы)")
     err_label_N_min = ttk.Label(master=window, foreground='red', textvariable=err_msg_n_min)
 
-    N_max_entry = ttk.Entry(master=window, textvariable=N_max, validatecommand=check_n_max, validate="focusout")
+    N_max_entry = ttk.Entry(master=window, textvariable=N_max, validatecommand=check_n_max, validate="key")
     N_max_label = ttk.Label(master=window, text="Верхняя граница аминного азота")
     err_label_N_max = ttk.Label(master=window, foreground='red', textvariable=err_msg_n_max)
 
@@ -846,12 +846,12 @@ def display_top_screen():
                                   command=start_experiments,
                                   width=40
                                   )
-    choice_series_label = ttk.Label(master=top_frame, text="Количество серий", font=medium_font)
+    choice_series_label = ttk.Label(master=top_frame, text="Число экспериментов", font=medium_font)
     choice_series_input = ttk.Entry(master=top_frame, textvariable=count_series, width=13)
     modes_alg_label.place(x=720, y=0)
     experiments_button.place(x=575, y=25)
     calculate_button.place(x=830, y=25)
-    choice_series_label.place(x=860, y=60)
+    choice_series_label.place(x=835, y=60)
     choice_series_input.place(x=985, y=60)
 
 display_top_screen()
