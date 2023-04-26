@@ -485,7 +485,7 @@ def is_valid_input_field(new_value):
     return bool(re.match(pattern, new_value))
 
 def change_is_neorg():
-    pass
+    return
 
 check_a_min = (root.register(is_valid_a_min), "%P")
 check_a_max = (root.register(is_valid_a_max), "%P")
@@ -746,7 +746,7 @@ def neorganic_change_but():
     global h
     window = Toplevel()
     window.title("Задание значений неорганики")
-    window.geometry(f'550x400+{(w - 550) // 2}+{(h - 400) // 2}')
+    window.geometry(f'670x400+{(w - 670) // 2}+{(h - 400) // 2}')
     window.protocol("WM_DELETE_WINDOW", lambda: close_neor_change_window(window))
     window.grab_set()
     start_x = 20
@@ -754,27 +754,27 @@ def neorganic_change_but():
     dif_y = 25
     dif_x = 250
     K_min_entry = ttk.Entry(master=window, textvariable=K_min, validatecommand=check_k_min, validate="key")
-    K_min_label = ttk.Label(master=window, text="Нижняя граница калия(ммоль/100г свеклы)")
+    K_min_label = ttk.Label(master=window, text="Нижняя граница калия (ммоль/100г свеклы)")
     err_label_k_min = ttk.Label(master=window, foreground='red', textvariable=err_msg_k_min)
 
     K_max_entry = ttk.Entry(master=window, textvariable=K_max, validatecommand=check_k_max, validate="key")
-    K_max_label = ttk.Label(master=window, text="Верхняя граница калия")
+    K_max_label = ttk.Label(master=window, text="Верхняя граница калия (ммоль/100г свеклы)")
     err_label_k_max = ttk.Label(master=window, foreground='red', textvariable=err_msg_k_max)
 
     Na_min_entry = ttk.Entry(master=window, textvariable=Na_min, validatecommand=check_na_min, validate="key")
-    Na_min_label = ttk.Label(master=window, text="Нижняя граница натрия(ммоль/100г свеклы)")
+    Na_min_label = ttk.Label(master=window, text="Нижняя граница натрия (ммоль/100г свеклы)")
     err_label_Na_min = ttk.Label(master=window, foreground='red', textvariable=err_msg_na_min)
 
     Na_max_entry = ttk.Entry(master=window, textvariable=Na_max, validatecommand=check_na_max, validate="key")
-    Na_max_label = ttk.Label(master=window, text="Верхняя граница натрия")
+    Na_max_label = ttk.Label(master=window, text="Верхняя граница натрия (ммоль/100г свеклы)")
     err_label_Na_max = ttk.Label(master=window, foreground='red', textvariable=err_msg_na_max)
 
     N_min_entry = ttk.Entry(master=window, textvariable=N_min, validatecommand=check_n_min, validate="key")
-    N_min_label = ttk.Label(master=window, text="Нижняя граница аминного азота(ммоль/100г свеклы)")
+    N_min_label = ttk.Label(master=window, text="Нижняя граница аминного азота (ммоль/100г свеклы)")
     err_label_N_min = ttk.Label(master=window, foreground='red', textvariable=err_msg_n_min)
 
     N_max_entry = ttk.Entry(master=window, textvariable=N_max, validatecommand=check_n_max, validate="key")
-    N_max_label = ttk.Label(master=window, text="Верхняя граница аминного азота")
+    N_max_label = ttk.Label(master=window, text="Верхняя граница аминного азота (ммоль/100г свеклы)")
     err_label_N_max = ttk.Label(master=window, foreground='red', textvariable=err_msg_n_max)
 
 
