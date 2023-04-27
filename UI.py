@@ -87,7 +87,7 @@ results = {}        # Основные результаты
 a_min = DoubleVar(value=0.1893)
 a_max = DoubleVar(value=0.2252)
 b_min = DoubleVar(value=0.98)
-b_max = DoubleVar(value=1.0)
+b_max = DoubleVar(value=0.995)
 
 is_venger_max = BooleanVar(value=False)
 is_venger_min = BooleanVar(value=False)
