@@ -145,11 +145,12 @@ def run_experiments(n: int, num_exp: int, inorganic: bool,
         s_arr_greedy = s_arr_greedy/num_exp
         target_funcs['Жадный алгоритм'] = s_arr_greedy
         results['Жадный алгоритм'] = round(s_arr_greedy[n-1], 6)
-        results['Погрешность жадного алг'] = round(abs(s_arr_max[n-1] - s_arr_greedy[n-1])/s_arr_max[n-1], 6)
     if is_thrifty:
         s_arr_thrifty = s_arr_thrifty/num_exp
         target_funcs['Бережливый алгоритм'] = s_arr_thrifty
         results['Бережливый алгоритм'] = round(s_arr_thrifty[n-1], 6)
+    if is_greedy:
+        results['Погрешность жадного алг'] = round(abs(s_arr_max[n-1] - s_arr_greedy[n-1])/s_arr_max[n-1], 6)
+    if is_thrifty:
         results['Погрешность бережливого алг'] = round(abs(s_arr_max[n-1] - s_arr_thrifty[n-1])/s_arr_max[n-1], 6)
-
     return target_funcs, results
